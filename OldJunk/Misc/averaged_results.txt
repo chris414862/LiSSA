@@ -1,0 +1,7 @@
+With document features:
+average macro f1 across new api versions: 0.9201441592290421
+std. dev of macro f1 across new api versions: 0.06222581394741399
+
+Only manual features:
+average macro f1 across new api versions: 0.9143244260228465
+std. dev of macro f1 across new api versions: 0.05952289200038473

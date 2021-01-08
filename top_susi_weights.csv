@@ -1,0 +1,51 @@
+,0
+<<manual>><Parameter to sink method println>,1.5233182176616866
+<<manual>><Parameter to sink method save>,1.458095018782152
+<<manual>><Parameter to sink method restore>,1.4375562950600242
+<<manual>><Parameter to sink method notify>,1.3104060155816266
+<<manual>><Method name ends with Messenger>,1.153609313307057
+<<manual>><Value from source method create to return>,1.1454642066274008
+<<manual>><Parameter to sink method send>,1.1420357266301318
+<<manual>><Method name starts with set>,1.1256786151393698
+<<manual>><Parameter to sink method write>,1.08642547901658
+<<manual>><Method name starts with get>,1.0435711800383534
+<<manual>><Parameter to sink method broadcast>,1.0322647367849065
+<<manual>><Parameter to sink method sync>,1.0038842123863367
+<<manual>><Method name starts with <init>>,0.9712496734515774
+<<manual>><Parameter to sink method bind>,0.954169015832188
+<<manual>><Return type is android.database.Cursor>,0.9439606312942841
+<<manual>><Value from source method is to return>,0.909412429865094
+<<manual>><Method name starts with open>,0.8911826061248646
+<<manual>><Method is part of class that ends with Context>,0.870915298154686
+<<manual>><Parameter to sink method adjust>,0.8495076260932581
+<<manual>><Parameter to sink method put>,0.8372606447317258
+<<manual>><Parameter to sink method enable>,0.8039390857825733
+<<manual>><Parameter type contains event>,0.7914905052240135
+<<manual>><Method name starts with onClick>,0.777839580271712
+<<manual>><Value from source method query to return>,0.7585590276071859
+<<manual>><Parameter to sink method remove>,0.7541733395101372
+<<manual>><Method name starts with restore>,0.7266068115157301
+<<manual>><Parameter to sink method disable>,0.7219256982166293
+<<manual>><Parameter to sink method start>,0.7176713443560501
+<<manual>><Return type is void>,0.7036563767905867
+<<manual>><Method is lone getter or setter>,0.6865390065794419
+<<manual>><Method name starts with disable>,0.6421252448091599
+<<manual>><Method name starts with send>,0.6286973411306072
+<<manual>><Parameter type contains com.google.common.io>,0.6173675229880665
+<<manual>><Return type is byte[]>,0.6138028800005919
+<<manual>><Method name starts with query>,0.5884546243077223
+<<manual>><Method is part of class that ends with Manager>,0.5699850074059365
+<<manual>><Parameter to sink method update>,0.5660486761393793
+<<manual>><Value from method get to sink method>,0.5654235303767525
+<<manual>><Parameter to sink method dial>,0.5389174050057044
+<<manual>><Return type is com.android.internal.telephony.Connection>,0.5389174050057044
+<<manual>><Parameter type contains com.android.inputmethod.keyboard.key>,0.5387383166075445
+<<manual>><Method is part of an anonymous class>,0.5313186156477369
+<<manual>><Parameter to sink method show>,0.5240664309567435
+<<manual>><Method name starts with toggle>,0.5222387542014892
+<<manual>><Method name starts with clear>,0.5136440643418602
+<<manual>><Parameter to sink method clear>,0.51364406434186
+<<manual>><Parameter is interface>,0.49477550525932684
+<<manual>><Parameter type contains java.io.>,0.4718148489727563
+<<manual>><Parameter type contains java.io.filedescriptor>,0.45148020470040684
+<<manual>><Method name starts with dump>,0.45148020470040684
