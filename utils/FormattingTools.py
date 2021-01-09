@@ -68,7 +68,7 @@ class Preprocessor():
         params = params.fillna(value="")
         params = params.unstack(level=-1, fill_value='')
         params = params.agg(','.join, axis=1).str.strip(',')
-        params = params.str.replace(",{2,}", repl=",")
+        params = params.str.replace(",{2,}", repl=",", regex=True)
         idx = classpath.str.cat([" "] * num_recs)
         idx = idx.str.cat(ret_type)
         idx = idx.str.cat([" "] * num_recs)
@@ -86,7 +86,7 @@ class Preprocessor():
 
 
     def convert_api_level(self, s:pd.Series):
-        s = s.str.replace(r"\D+", '').fillna(-1)
+        s = s.str.replace(r"\D+", '', regex=True).fillna(-1)
         s[s == ''] = s[s == ''].replace("", -1)
         return s.astype(int)
 
@@ -355,7 +355,7 @@ class Preprocessor():
         s = s.str.replace(r":", repl="", regex=True).str.strip()
         s = s.str.replace(r"\(.*", repl="", regex=True).str.strip()
         s = s.str.replace(r"\.", repl=" ", regex=True).str.strip()
-        s = s.str.replace(r"([^A-Z]*)([A-Z])", repl=r"\1 \2").str.lower()
+        s = s.str.replace(r"([^A-Z]*)([A-Z])", repl=r"\1 \2", regex=True).str.lower()
         s = s.str.replace(r" +", repl=" ", regex=True).str.strip()
         return s
 
@@ -368,7 +368,7 @@ class Preprocessor():
         split_cols = []
 
         if qual_path:
-            t =split_sig.str.get(0).str.replace(r"<(.*)\.[A-Za-z]*:", repl=r"\1")
+            t =split_sig.str.get(0).str.replace(r"<(.*)\.[A-Za-z]*:", repl=r"\1", regex=True)
             split_cols.append(self.split_camel(t))
         if class_name:
             split_cols.append(self.split_camel(split_sig.str.get(0).str.split(".").str.get(-1)))

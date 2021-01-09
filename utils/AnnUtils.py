@@ -87,8 +87,12 @@ def make_method_id(row):
         return None
 
 
-def make_annotation_subset(df:pd.DataFrame, k:int, cols_to_use:list, new_cols_for_anns:list):
+def make_annotation_subset(df:pd.DataFrame, k:int, cols_to_use:list, new_cols_for_anns:list, do_not_use:pd.Series=None):
     df = df.loc[~df.index.duplicated(keep='first')]
+    if k > df.shape[0] :
+        print("WARNING: subset is larger than total set", k,">", df.shape[0])
+        print("\tSetting subset equal to", df.shape[0])
+        k = df.shape[0]
     df = df.sample(n=k)[cols_to_use]
     for col in new_cols_for_anns:
         df[col] = ''
@@ -150,7 +154,7 @@ def add_extra_descrips(df:pd.DataFrame, descrips:pd.DataFrame, descrip_col_name=
     return df
 
 def create_and_save_annotations(df, num_in_subset, cols_to_use, new_cols, class_descrips, package_descrips,
-                                save_filename):
+                                save_filename, do_not_use=None):
     '''
 
 
@@ -161,7 +165,7 @@ def create_and_save_annotations(df, num_in_subset, cols_to_use, new_cols, class_
     :return:
     '''
     df = make_annotation_subset(df.loc[df["Classname"].notna()], num_in_subset, cols_to_use,
-                                new_cols)
+                                new_cols, do_not_use=do_not_use)
 
     df = add_extra_descrips(df, class_descrips, descrip_col_name='ClassDescription')
     df = add_extra_descrips(df, package_descrips, descrip_col_name='PackageDescription')
