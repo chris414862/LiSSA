@@ -5,7 +5,7 @@ from Evaluation.Evaluator import Evaluator
 from SSModel.cLiSSAfier import cLiSSAfier
 import sys
 '''
-This experiments compares features on the NEW set of method annotations (api level 28 & 29) 
+This experiment compares features on the NEW set of method annotations (api level 28 & 29) 
 but adds the OLD annotations to each fold. Simulates an update of annotations for new API version
 10 fold cross-validation
 '''

@@ -5,6 +5,9 @@ import numpy as np
 from SSModel.ModelInterface import Model
 import sys
 from scipy.sparse.csr import csr_matrix
+from utils.Configuration import ConfigSVMSearch, ConfigNLFeatures, ConfigNLFeaturesSearch, ConfigSVM
+import random
+import time
 '''
 This class is responsible for performing the evaluation of a cLiSSAfier model. The internals of the classification 
 model, tokenization scheme, and the vector representations are abstracted and lie in the implementation of the 
@@ -123,6 +126,267 @@ class Evaluation():
             print(avg_df.round(3).to_latex())
 
 
+    def max_average(self,classification_df_lists, configs, silent=True):
+        best_config = None
+        best_score = -1.0
+        stats_of_best = None
+        if len(classification_df_lists) != len(configs):
+            raise ValueError("classification_df_lists length should equal configs length. Instead:"+str(len(classification_df_lists))+", "+str(len(configs)))
+        for i in range(len(configs)):
+            config_results_list = classification_df_lists[i]
+            config = configs[i]
+            avg_result, std_df = self.average_classification_reports(config_results_list)
+
+            if avg_result.loc['macro avg', 'f1-score'] >= best_score:
+                best_score = avg_result.loc['macro avg', 'f1-score']
+                best_config = config
+                stats_of_best = (avg_result, std_df)
+                # print("New best config")
+                # print(best_config)
+                # print(stats_of_best[0])
+            if not silent:
+                print(config)
+                print(avg_result)
+                print()
+
+            # print(i)
+            # print(config)
+            # print(avg_result)
+        return best_config, stats_of_best
+
+    class inner_prog_bar():
+        def __init__(self, tot_folds, sub_steps, bar_width=20):
+            self.tot_folds = tot_folds
+            self.num_sub_steps = sub_steps
+            self.tot_steps = self.tot_folds*self.num_sub_steps
+            self.label_string ="Inner fold number: {curr_fold_num} "
+            self.max_label_string_len = len(self.label_string.format(curr_fold_num=self.tot_folds))
+            # print("total steps", self.tot_steps)
+            # print("total folds", self.tot_folds)
+            self.curr_step = 0
+            self.bar_width = bar_width
+
+        def display(self):
+            fold_num = self.curr_step//self.num_sub_steps+1
+            progress = int(self.curr_step/self.tot_steps *self.bar_width)
+
+            # Make sure last step completes bar. If bar_width > tot_steps, gap can be left
+            if self.curr_step == self.tot_steps-1:
+                #Leave one space for '>'
+                progress = self.bar_width-1
+
+            string = f"{self.label_string.format(curr_fold_num=fold_num):<{self.max_label_string_len}}"
+            string += f" |{('='*progress)+'>':<{self.bar_width}}|"
+            if self.curr_step < self.tot_steps - 1:
+                string += "\r"
+            else:
+                string += "\n"
+            print(string, end="")
+            self.curr_step += 1
+
+
+    def find_best_config(self, x_train, y_train, inner_cv, feature_column=None, search_space=None, seed=0):
+        if search_space is None:
+            return None
+        best_config=None
+        best_score=0.0
+        configs =[] 
+        classification_df_lists = []#[[] for i in range(num_configs)]
+        prog_bar = self.inner_prog_bar(inner_cv.n_splits, search_space.num_to_generate())
+        for j, inner_train_test_idxs in enumerate(inner_cv.split(x_train)):
+            inner_x_train, inner_y_train, inner_x_dev, inner_y_dev = Evaluation.perform_kf_split(x_train, y_train, train_test_idxs=inner_train_test_idxs)
+            # if feature_column is not None and j > 0:
+            #     break
+
+            for i, config in enumerate(search_space.generator()):
+                # if feature_column is None:
+                #     print(config)
+                prog_bar.display()
+                if feature_column is None:# Used in feature subset optimization
+                    feat_cols_and_hyperparams = self.svm_config2model_params(config)
+                
+                else: # Used in Vectorizer optimization of one feature set 
+                    feat_cols_and_hyperparams = {feature_column:config.as_feat_dict()}
+
+
+                if j == 0:
+                    classification_df_lists.append([])
+                    configs.append(config)
+
+                self.model.reset_w_seed(seed)
+                self.model.train(inner_x_train, inner_y_train, feat_cols_and_hyperparams=feat_cols_and_hyperparams)
+                y_dev_hat,_ = self.model.predict(inner_x_dev)
+                cr = classification_report(inner_y_dev, y_dev_hat, digits=4, output_dict=True, zero_division=0)
+                cr_df = self.create_classification_report_df(cr, y_dev_hat)
+                classification_df_lists[i].append(cr_df)
+
+         
+        best_config, stats = self.max_average(classification_df_lists, configs)#, silent=feature_column is not None)
+        # if feature_column is None:
+        #     sys.exit()
+        return best_config, stats
+
+    def nl_config2nl_search(self, config:ConfigNLFeatures):
+        d = config.as_feat_dict()
+        return ConfigNLFeaturesSearch(**{k+"_lst":[v] for k, v in d.items()})
+
+
+    def svm_config2model_params(self, config:ConfigSVM):
+        tmp = {k:v for k, v in config.as_feat_dict().items() if v is not None}
+        feat_cols_and_hyperparams = {k:v.as_feat_dict()   for k, v in tmp.items() if k != "Manual_Feats"} 
+        if "Manual_Feats" in tmp.keys():
+            feat_cols_and_hyperparams["Manual_Feats"] = tmp["Manual_Feats"]
+        return feat_cols_and_hyperparams
+
+
+    def average_multiple(self, num_runs, func, func_name="", stochastic=True, func_params={}):
+        header = f" AVERAGING {num_runs} FULL {func_name.upper()} EVALUATIONS "
+        eval_title = ' STARTING EVAL #{eval_num} seed: {seed} '
+        border_len = 20
+
+        if stochastic:
+            random.seed(time.time())
+            seeds = [random.randint(0,1000) for i in range(num_runs)]
+        else:
+            seeds = [i for i in range(num_runs)]
+
+        #TODO: Fully handle case for boarders when eval_title is longer than header
+        title_len = max(len(header), len(eval_title.format(eval_num = num_runs, seed = max(seeds))))+2
+        full_header = f"{header:#^{2*border_len+title_len}}"
+        full_header_len = len(full_header)
+        print(full_header)
+        print("Stochastic:", stochastic)
+        print("Seeds:", seeds)
+
+        results_df_list = []
+        full_record = {}
+        for i in range(num_runs):
+            eval_header = eval_title.format(eval_num=i+1,seed=seeds[i])
+            print(f"{eval_header:=^{full_header_len}}")
+
+            func_params['seed'] = seeds[i]
+            results, run_record = func(**func_params) 
+            results_df_list.append(results)
+            full_record["run_"+str(i+1)] = run_record
+
+            print("\n"+"-"*full_header_len)
+            print("EVAL",i+1, "RESULTS:")
+            print(results)
+            print("-"*full_header_len)
+
+        results_of_evals_list = [data_dict["stats"] for eval_num, data_dict in full_record.items()]        
+        averaged_performance_estimate_df, std_df = self.average_classification_reports(results_of_evals_list)
+        full_record["stats"] = averaged_performance_estimate_df
+        full_record["std"] = std_df
+        full_record["num_runs"] = num_runs
+        full_record["info_str"] = "This level of the record contains results from averaging "+str(num_runs)\
+                                    +func_name\
+                                    +(" " if func_name != "" else "")\
+                                    +"evaluations"
+
+        print(f"{'FINISHED':#^{full_header_len}}")
+        return averaged_performance_estimate_df, full_record 
+
+    def nested_kfold_eval(self, outer_folds=10, inner_folds=10, feats2search_spaces=None, man_feats_name="Manual_Feats", seed=0):
+        """
+              Optimize hyperparameter settings on inner cross-val loop (used as dev set)
+                  -First, find best hyperparameters separately for each feature class's TfidfVectorizer parameters
+                  -Second, find best subset of the total set of feature classes
+             
+              Current set of feature classes: { manual features from SuSi, return descriptions, parameter descriptions
+                                              , method descriptions, signature features}
+        """
+        to_shuffle=True
+
+        inner_cv = KFold(n_splits=inner_folds, shuffle=to_shuffle, random_state=seed)
+        outer_cv = KFold(n_splits=outer_folds, shuffle=to_shuffle, random_state=seed)
+
+        outer_cv_record_dict = {}
+        for i, outer_train_test_idxs in enumerate(outer_cv.split(self.X)):
+            print("\nStarting outer loop:", i+1)
+
+            #Optimize with xx_train, evaluate with xx_test
+            out_x_train, out_y_train, out_x_test, out_y_test = Evaluation.perform_kf_split(self.X, self.y, train_test_idxs=outer_train_test_idxs)
+
+            inner_cv_record_dict = {}
+            if feats2search_spaces is None:
+                return None
+
+            # Optimize Sklearn's Vectorizer hyperparameters
+            inner_cv_record_dict["nl_features_set"] = {}
+            for feat_name, search_space in feats2search_spaces.items():
+                if feat_name != man_feats_name:# Not optimizing manual features. Assumed to already have been done by SuSi authors. We are just using as-is
+                    print("Finding best setting for",feat_name,"features...")
+                    best_config, (stats, std_df) = self.find_best_config(out_x_train, out_y_train, inner_cv, feature_column=feat_name
+                                                                        , search_space=search_space, seed=seed)
+                    inner_cv_record_dict["nl_features_set"][feat_name] ={"config":best_config, "stats":stats, "std":std_df}
+
+
+            # prepare svm feature set search space
+            feat_sets_to_search = {}
+            if len(inner_cv_record_dict['nl_features_set'].keys()) > 0: #documentation featurs
+                for feat_name, data_dict in inner_cv_record_dict['nl_features_set'].items():
+                    feat_sets_to_search[feat_name] = self.nl_config2nl_search(data_dict["config"])
+
+            if man_feats_name in feats2search_spaces.keys(): #manual (SuSi) features
+                feat_sets_to_search[man_feats_name] = feats2search_spaces[man_feats_name]
+
+            svm_config_search = ConfigSVMSearch(feat_dict=feat_sets_to_search, generate_singletons=True)
+
+            # Optimize subset to use
+            print("Finding best feature subset...")
+            best_svm_config, (best_subset_stats, std_df) = self.find_best_config(out_x_train, out_y_train, inner_cv
+                                                                                , search_space=svm_config_search, seed=seed)
+            inner_cv_record_dict["config"] = best_svm_config
+            inner_cv_record_dict["stats"] = best_subset_stats
+            inner_cv_record_dict["std"] = std_df 
+            inner_cv_record_dict["num_inner_folds"] = inner_cv.n_splits
+            inner_cv_record_dict["info_str"] = "This level of the record contains results from the hyperparameter "\
+                                            + "optimization in the inner loop of "\
+                                            + "nested cross-validation (used as dev/train splits)."\
+                                            + "The results of the various averaged inner cross-validation optimization runs can "\
+                                            + "be found here, but we do not store the results of each fold of the inner loop due to "\
+                                            + "the large search space and number of optimization steps."
+                                            
+
+            # Evaluate best performing inner cv configuration on outer test fold
+            self.model.reset_w_seed(seed)
+            self.model.train(out_x_train, out_y_train, feat_cols_and_hyperparams=self.svm_config2model_params(best_svm_config))
+            y_test_hat,_ = self.model.predict(out_x_test, out_y_test)
+            cr = classification_report(out_y_test, y_test_hat, digits=4, output_dict=True, zero_division=0)
+            stats = self.create_classification_report_df(cr, y_test_hat)
+            print("\nBest configuration found in inner cv:")
+            print(best_svm_config)
+            print("Averaged inner cv results:")
+            print(best_subset_stats)
+            print("Results on outer fold "+str(i+1)+":")
+            print(stats)
+
+            # Store results
+            outer_cv_record_dict["outer_fold_"+str(i+1)] = {}
+            outer_cv_record_dict["outer_fold_"+str(i+1)]["stats"] = stats
+            outer_cv_record_dict["outer_fold_"+str(i+1)]["inner_cv_record"] = inner_cv_record_dict
+            outer_cv_record_dict["outer_fold_"+str(i+1)]["info_str"] = "This level of the record contains results from testing "\
+                                                                      +"the model on outer fold number "+str(i+1)+". Hyperparameters "\
+                                                                      +"were optimized using all folds not including "+str(i+1)+" by "\
+                                                                      +"using an inner loop of cross-validation. Note: No standard "\
+                                                                      +"deviation information exists for this level since "+str(i+1)+" "\
+                                                                      +"is the only test fold on this level of the record." 
+
+
+        outer_stats_df_list = [data_dict["stats"] for fold_num, data_dict in outer_cv_record_dict.items()]        
+        final_performance_estimate_df, std_df = self.average_classification_reports(outer_stats_df_list)
+        outer_cv_record_dict["stats"] = final_performance_estimate_df
+        outer_cv_record_dict["std"] = std_df
+        outer_cv_record_dict["num_outer_folds"] = outer_cv.n_splits
+        outer_cv_record_dict["info_str"] = "This level of the record contains results from the testing folds of the outer loop of "\
+                                           +"nested cross-validation"
+
+        return final_performance_estimate_df, outer_cv_record_dict
+        
+        
+
+
     def kfold_eval_internal(self, folds=10):
         '''
         Performs a kfold evaluation
@@ -156,7 +420,8 @@ class Evaluation():
             # print('\nTesting set:')
             # print(cr_df)
             reports.append(cr_df)
-        return self.average_classification_reports(reports)
+        avg_df, std_df = self.average_classification_reports(reports)
+        return avg_df
 
     def create_classification_report_df(self, cr, y_hat):
 
@@ -168,6 +433,51 @@ class Evaluation():
         return df
 
 
+    def reduce_cr_list(self, reports, reduction="avg", avg_df=None):
+        """
+            Manually wrote reduction func because we want to make sure we handle edge cases correctly.
+            Sometimes a fold has no instances of one class and we should not include that in the reduction
+            if there were no predictions for it.
+        """
+        if len(reports) == 0:
+            return None
+        
+        counts = {cl:0 for cl in self.class_labels}
+        max_len_index = max([rep.index for rep in reports], key=lambda x: x.shape[0])
+        reduc_df:pd.DataFrame = pd.DataFrame(index=max_len_index, columns=reports[0].columns)
+        reduc_df = reduc_df.fillna(0.0)
+
+        for i,report in enumerate(reports):
+
+            #Only count cases when test fold had positive instances or there were no positive instances and our model predicted incorrectly
+            # Some unlucky draws do not contain a class and if we do not track, we can over divide
+            for row in report.index:
+                if row in self.class_labels and not (report.loc[row,'support'] ==0.0 and  report.loc[row,'#Predictions']==0.0):
+                    counts[row] +=1
+
+            if reduction == "avg":
+                reduc_df.loc[report.index] += report.fillna(0.0)
+            elif reduction == "std" or reduction == "var":
+                if avg_df is None:
+                    raise ValueError("If reduction is std or var, must include avg_df")
+                # print("report:")
+                # print(report.fillna(0.0))
+                # print("avg:")
+                # print(avg_df)
+                reduc_df.loc[report.index] += (report.fillna(0.0)-avg_df)**2
+
+        # divide each row by correct number of instances
+        for count_key in counts.keys():
+            reduc_df.loc[count_key] /= counts[count_key]
+
+        reduc_df.loc['macro avg'] /= len(reports)
+        reduc_df.loc['weighted avg'] /= len(reports)
+
+        if reduction == "std":
+            reduc_df = reduc_df.apply(np.sqrt)
+
+        return reduc_df
+
 
     def average_classification_reports(self, reports: list, ytest_hat=None):
         '''
@@ -178,41 +488,33 @@ class Evaluation():
         :param ytest_hat:
         :return:
         '''
-        counts = {cl:0 for cl in self.class_labels}
-        max_len_index = max([rep.index for rep in reports], key=lambda x: x.shape[0])
-        sum_df = pd.DataFrame(index=max_len_index, columns=["precision", "recall", "f1-score", "support", "#Predictions"])
-        sum_df = sum_df.fillna(0.0)
-        # print('tracking reports')
-        for i,rep in enumerate(reports):
-            for row in rep.index:
-                if row in self.class_labels and row in rep.index.tolist()\
-                        and not (rep.loc[row,'support'] ==0.0 and  rep.loc[row,'#Predictions']==0.0):
-                    counts[row] +=1
-            # print(i)
-            # print(rep.fillna(0.0))
-            sum_df.loc[rep.index] += rep.fillna(0.0)
-            # print(sum_df)
+        metric_names = ["precision", "recall", "f1-score", "support", "#Predictions"]
+        avg_df = self.reduce_cr_list(reports, reduction="avg")
+        std_df = self.reduce_cr_list(reports, reduction="std", avg_df=avg_df)
+        std_df.columns = [col_name+"(std)" for col_name in std_df.columns]
+        return avg_df, std_df
 
-        for count_key in counts.keys():
-            sum_df.loc[count_key] /= counts[count_key]
-        sum_df.loc['macro avg'] /= len(reports)
-        sum_df.loc['weighted avg'] /= len(reports)
-        sum_df.loc[['macro avg','weighted avg'],'#Predictions'] = pd.NA
-        # print('counts:', counts)
-        print("####### Final Result ###########")
-        print(sum_df)
-
-        return sum_df
 
 
 
 class Evaluator():
+    '''
+        This basically just wraps the Evaluation class. However, the Evaluator is responsible 
+        for feature analysis that is done after the evaluation.
+
+    '''
 
     def __init__(self, *args, **kwargs):
         self.evaluation = Evaluation(*args, **kwargs)
 
     def kfold_eval(self, *args, **kwargs):
         self.evaluation.kfold_eval(*args, **kwargs)
+
+    def nested_kfold_eval(self, *args, **kwargs):
+        return self.evaluation.nested_kfold_eval(*args, **kwargs)
+
+    def average_multiple(self, *args, **kwargs):
+        return self.evaluation.average_multiple(*args, **kwargs)
 
     def classic_eval(self, *args, **kwargs):
         self.evaluation.classic_eval(*args, **kwargs)

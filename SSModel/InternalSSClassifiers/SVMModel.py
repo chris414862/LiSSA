@@ -13,12 +13,20 @@ import numpy as np
 class SVMModel(Model):
 
     def __init__(self):
-        self.vectorizer = BoWVectorizer()
-        self.model = LinearSVC(max_iter=10000)#SVC(kernel='linear', decision_function_shape='ovo', shrinking=False)#
+        self.vectorizer = None
+        #Defaults to deterministic behavior. Use reset_w_seed to use stochastically.  
+        self.seed = 0
+        self.model_class = LinearSVC
+        self.model = LinearSVC(random_state=self.seed)
         # self.model = CalibratedClassifierCV(self.svc, 'isotonic',10)
 
     def get_class_labels(self) -> list:
         return self.model.classes_.tolist()
+
+    def reset_w_seed(self, seed):
+        self.seed = seed
+        self.model = self.model_class(random_state=seed)
+
 
     def get_model_type(self) -> str:
         return 'SVM'
@@ -33,8 +41,14 @@ class SVMModel(Model):
         return self.model
 
     def train(self, X, y, feat_cols_and_hyperparams=None):
+        self.vectorizer = BoWVectorizer()
+        # print("X")
+        # print(X)
         self.vectorizer.fit_methods(X, feat_cols_and_hyperparams)
         vectorized_X = self.vectorizer.transform_methods(X).todense()
+        # print("vectorised_X")
+        # print(vectorized_X)
+        # print(feat_cols_and_hyperparams)
 
         self.model.fit(vectorized_X, y)
 

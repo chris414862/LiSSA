@@ -63,7 +63,7 @@ class BoWVectorizer(Vectorizer):
         :return:
         '''
         self.man_feat_cols = self.find_man_feat_cols(df)
-        print("Manual Features:", len(self.man_feat_cols))
+        # print("Manual Features:", len(self.man_feat_cols))
         # print('len df cols:', len(df.columns))
         # print([col for col in df.columns if col not in self.man_feat_cols])
         self.add_to_mapping([(mfc, i) for i, mfc in enumerate(self.man_feat_cols)], 'manual')
@@ -88,7 +88,7 @@ class BoWVectorizer(Vectorizer):
                                 , max_features=hyperparameters['max_features']
                                 , ngram_range=hyperparameters['ngram_range']).fit(X.to_numpy())
         self.api_feat_vectorizers.append((X.name, tfidf))
-        print(col, len(tfidf.vocabulary_))
+        # print(col, len(tfidf.vocabulary_))
         self.add_to_mapping(tfidf.vocabulary_, disambiguator=str(X.name))
 
 
