@@ -1,0 +1,5 @@
+TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+0.241     0.026      0.73      0.241     0.362      0.736    source
+0         0.002      0         0         0          0.677    sink
+0.97      0.79       0.78      0.97      0.865      0.59     neithernor
+0.775     0.593      0.743     0.775     0.724      0.626    Weighted Avg.    

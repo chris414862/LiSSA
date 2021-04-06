@@ -1,0 +1,332 @@
+import numpy as np
+import pandas as pd
+from itertools import chain, combinations
+from collections import defaultdict
+import copy
+
+
+class ConfigNLFeatures():
+    """
+    This class defines 1 configuration for LiSSA's feature extraction
+    """
+    min_df_default = 3
+    max_df_default = .8
+    max_features_default = 2000 
+    ngram_range_default = (1,1)  
+
+    def __init__(self
+            ,min_df       = 3
+            ,max_df       = .8
+            ,max_features = 2000
+            ,ngram_range  = (1, 1)
+            ):
+        self.min_df = min_df
+        self.max_df = max_df
+        self.max_features = max_features
+        self.ngram_range = ngram_range
+
+    def __str__(self):
+
+        return "Min count threshold: "+str(self.min_df)+\
+               ", Max pct threshold: "+str(self.max_df)+\
+               ", Max features: " +str(self.max_features)+\
+               ", Ngram range: " +str(self.ngram_range)
+
+    def as_feat_dict(self):
+        return {"min_df":self.min_df, "max_df":self.max_df, "max_features":self.max_features, "ngram_range":self.ngram_range}
+
+
+
+class ConfigNLFeaturesSearch():
+    def __init__(self
+            ,min_df_lst       = []
+            ,max_df_lst       = []
+            ,max_features_lst = []
+            ,ngram_range_lst  = []
+            ):
+        self.min_df_lst = min_df_lst
+        # self.min_df_iter = iter(self.min_df)
+        self.max_df_lst = max_df_lst
+        # self.max_df_iter = iter(self.max_df)
+        self.max_features_lst = max_features_lst
+        # self.max_features_iter = iter(self.max_features)
+        self.ngram_range_lst = ngram_range_lst
+        self.search_space = [ ("min_df", self.min_df_lst)
+                            , ("max_df", self.max_df_lst)
+                            , ("max_features", self.max_features_lst)
+                            , ("ngram_range", self.ngram_range_lst)
+                            ]
+        
+    def update_space(self, name, space):
+        new_space = []
+        for orig_name, orig_space, in self.search_space:
+            if name == orig_name:
+                new_space.append((name, space))
+            else:
+                new_space.append((orig_name, orig_space))
+        self.search_space = new_space
+
+
+
+    def use_default(self, feat_name):
+        if feat_name == "min_df":
+            self.min_df_lst = [ConfigNLFeatures.min_df_default]
+            self.update_space(feat_name, self.min_df_lst)
+
+        elif feat_name == "max_df":
+            self.max_df_lst = [ConfigNLFeatures.max_df_default]
+            self.update_space(feat_name, self.max_df_lst)
+        elif feat_name == "max_features":
+            self.max_features_lst = [ConfigNLFeatures.max_features_default]
+            self.update_space(feat_name, self.max_features_lst)
+        elif feat_name == "ngram_range":
+            self.ngram_range_lst = [ConfigNLFeatures.ngram_range_default]
+            self.update_space(feat_name, self.ngram_range_lst)
+
+    
+    # def __iter__(self):
+    #     for feat_name, space in self.search_space:
+    #         if len(space) == 0:
+    #             self.use_default(feat_name)
+    #
+    #     return self
+
+
+    def num_to_generate(self):
+        return len([i for i in self.generator()])
+
+    def generator(self):
+        for name, space in self.search_space:
+            if len(space) == 0:
+                self.use_default(name)
+
+
+        for min_df in self.min_df_lst:
+            for max_df in self.max_df_lst:
+                for max_features in self.max_features_lst:
+                    for ngram_range in self.ngram_range_lst:
+                        new_config = ConfigNLFeatures(min_df=min_df, max_df=max_df, max_features=max_features, ngram_range=ngram_range)
+                        yield new_config
+                        
+    def __str__(self):
+        ret = "Searching:"
+        for name, val in self.search_space:
+            ret += "\n\t"+name+": "+str(val)
+        return ret
+
+
+class ConfigSVM():
+    """
+    This class defines 1 configuration for LiSSA's SVM model
+    """
+    def __init__(self
+            , manual_feats:bool=True
+            , return_descrips:ConfigNLFeatures=None
+            , param_descrips:ConfigNLFeatures=None
+            , method_descrips:ConfigNLFeatures=None
+            , sig_feats:ConfigNLFeatures=None
+            , feat_dict=None
+            ):
+        if feat_dict is None:
+            self.manual_feats=manual_feats
+            self.return_feats=return_descrips
+            self.param_feats=param_descrips
+            self.method_feats=method_descrips
+            self.sig_feats=sig_feats
+            self.feat_dict = {
+                                  "Manual_Feats": self.manual_feats
+                                , "Return": self.return_feats
+                                , "Parameters": self.param_feats
+                                , "Description": self.method_feats
+                                , "SigFeatures": self.sig_feats
+                             }
+        else:
+            self.manual_feats=feat_dict.get("Manual_Feats", None)
+            self.return_feats=feat_dict.get("Return", None)
+            self.param_feats=feat_dict.get("Parameters", None)
+            self.method_feats=feat_dict.get("Description", None)
+            self.sig_feats=feat_dict.get("SigFeatures", None)
+            self.feat_dict = feat_dict    
+
+         
+    def __str__(self):
+        ret = ""
+        for feat_name, feat_config in self.feat_dict.items():
+            ret += "Feature set: "+feat_name+"\n\t"+str(feat_config)+"\n"
+        return ret
+
+    def as_feat_dict(self):
+        return self.feat_dict
+
+    def num_feat_sets(self):
+        return sum([1 if val is not None else 0 for val in self.feat_dict.values()])
+
+
+class ConfigSVMSearch():
+    def __init__(self
+            , manual_feat_search:list=[True]
+            , return_feat_search:ConfigNLFeatures=None
+            , param_feat_search:ConfigNLFeatures=None
+            , method_feat_search:ConfigNLFeatures=None
+            , sig_feat_search:ConfigNLFeatures=None
+            , feat_dict=None
+            , generate_singletons=False
+            ):
+        if feat_dict is None:
+            self.manual_feat_search=manual_feat_search
+            self.return_feat_search=return_feat_search
+            self.param_feat_search=param_feat_search
+            self.method_feat_search=method_feat_search
+            self.sig_feat_search=sig_feat_search
+        else:
+            self.manual_feat_search=feat_dict.get("Manual_Feats", None)
+            self.return_feat_search=feat_dict.get("Return", None)
+            self.param_feat_search=feat_dict.get("Parameters", None)
+            self.method_feat_search=feat_dict.get("Description", None)
+            self.sig_feat_search=feat_dict.get("SigFeatures", None)
+
+        self.generate_singletons = generate_singletons
+        self.search_space = {
+                              "Manual_Feats": self.manual_feat_search
+                            , "Return": self.return_feat_search
+                            , "Parameters": self.param_feat_search
+                            , "Description": self.method_feat_search
+                            , "SigFeatures": self.sig_feat_search
+                            }
+
+    def update_feat_search(self, name, feat_search):
+        self.__dict__[name] = feat_search
+
+    def num_to_generate(self):
+        return len([i for i in self.generator()])
+    
+    # def populate_default_feat_spaces(self):
+    #     new_search_space = {}
+    #     for name, feat_search_space in self.search_space.items():
+    #         if feat_search_space is None:
+    #             continue
+    #
+    #         if name == "Manual_Feats":
+    #             continue
+    #             # if feat_search_space is None:
+    #             #     feat_search_space = [True]
+    #             #     self.update_feat_search(name, feat_search_space)
+    #         # else:
+    #         # Natural language features
+    #         if feat_search_space is None:
+    #             feat_search_space = ConfigNLFeaturesSearch()
+    #             self.update_feat_search(name, feat_search_space)
+    #     
+    #         # Use defaults if none specified
+    #         for feat_param_name, space in feat_search_space.search_space:
+    #             # print("checking feat space:", name, space, len(space))
+    #             if len(space) == 0:
+    #                 feat_search_space.use_default(feat_param_name)
+    #                 # feat_search_space.min_df = [.9999]
+    #                 # print("UPDATE", feat_search_space)
+    #
+    #     # print("new val", feat_search_space)
+    #     new_search_space[name] = feat_search_space
+    #     # print("new_search_space", new_search_space)
+    #     self.search_space = new_search_space
+
+    # def yield_all_configs(self, feat_search_space):
+    #     for config in feat_search_space:
+    #         yield config
+
+    def build_svm_feat_dict(self, feat_search_list, built_so_far:dict, store_completed):
+        if len(feat_search_list) == 0:
+            return 
+        if len(feat_search_list) == 1:
+            feat_name, feat_space = feat_search_list[0] 
+            if feat_name == "Manual_Feats":
+                # print("feat space:", feat_space)
+                for feat in feat_space:
+                    cpy = copy.deepcopy(built_so_far)
+                    cpy[feat_name] = feat
+                    store_completed.append(cpy)
+
+            else:
+                for feat_config in feat_space.generator():
+                    cpy = copy.deepcopy(built_so_far)
+                    cpy[feat_name] = feat_config
+                    store_completed.append(cpy)
+            return
+
+
+        feat_name, feat_space = feat_search_list[0]
+        if feat_name == "Manual_Feats":
+            for feat_config in feat_space:
+                cpy = copy.deepcopy(built_so_far)
+                cpy[feat_name] = feat_config
+                self.build_svm_feat_dict(feat_search_list[1:],cpy,store_completed)
+        else:
+            for feat_config in feat_space.generator():
+                cpy = copy.deepcopy(built_so_far)
+                cpy[feat_name] = feat_config
+                self.build_svm_feat_dict(feat_search_list[1:],cpy,store_completed)
+
+
+
+
+        return 
+
+
+    def generator(self):
+
+        # self.populate_default_feat_spaces()
+        pset = powerset([(feat_name, search_space) for (feat_name, search_space) in self.search_space.items() if search_space is not None])
+        
+        # single_feats =
+        feat_dicts = []
+        print("feat dict:")
+        print(self.search_space.items())
+        print("Powerset")
+        print([s for s in pset])
+        for subset in pset:
+            print("SUBSET:", len(subset), subset )
+            feat_dict = {}
+            # for i in range(len(subset):
+            self.build_svm_feat_dict(subset,{}, feat_dicts) 
+            # for feat_dict in feat_dicts:
+            #     for feat, val in feat_dict.items():
+            #         print(feat, val)
+        print("feat_dicts")
+        print(feat_dicts)
+
+        for feat_dict in feat_dicts:
+            if not self.generate_singletons and len(feat_dict.keys()) <=1:
+                continue
+            
+            
+            yield ConfigSVM(feat_dict=feat_dict)
+
+                
+                # print(c)
+
+            
+            # for name, feat_config in subset:
+            #     print(name, feat_config)
+            # print("-"*50)
+
+        # for man_feat_option in self.manual_feat_search:
+        #     for return_feat_config in self.return_feat_search.generator():
+        #         for param_feat_config in self.param_feat_search.generator():
+        #             for method_feat_config in self.method_feat_search.generator():
+        #                 for sig_feat_config in self.sig_feat_search.generator():
+        #                     new_svm_config = ConfigSVM(man_feat_option, return_feat_config, param_feat_config, method_feat_config, sig_feat_config)
+        #                     yield new_svm_config
+
+
+
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(1,len(s)+1))
+
+
+
+
+
+

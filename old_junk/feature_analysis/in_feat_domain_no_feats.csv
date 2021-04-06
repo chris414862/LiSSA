@@ -1,0 +1,79 @@
+,0
+<Method name starts with process>,0.0
+<Parameter to sink method remove>,0.0
+<Parameter to sink method insert>,0.0
+<Parameter type contains com.google.common.io>,0.0
+<Parameter type contains java.io.filedescriptor>,0.0
+<Parameter type contains android.filterfw.core.filtercontext>,0.0
+<Parameter to sink method connect>,0.0
+<Parameter to sink method clear>,0.0
+<Method returns constant>,0.0
+<Method is part of an anonymous class>,0.0
+<Method name ends with Messenger>,0.0
+<Parameter to sink method enable>,0.0
+<Parameter to sink method enqueue>,0.0
+<Method is part of a PROTECTED class>,0.0
+<Parameter to sink method broadcast>,0.0
+<Method is part of class android.app.BroadcastReceiver>,0.0
+<Parameter to sink method replace>,0.0
+<Base name of class package name: io>,0.0
+<Method is part of class that contains the name java.io.>,0.0
+<Parameter to sink method onCreate>,0.0
+<Value from method get to sink method>,0.0
+<Parameter to sink method start>,0.0
+<Method is part of class that contains the name com.google.common.io>,0.0
+<Parameter to sink method println>,0.0
+<Parameter to sink method com.android.internal.telephony.CommandsInterface>,0.0
+<Parameter to abstract sink>,0.0
+<Value from method parameter to native method>,0.0
+<Method name starts with bind>,0.0
+<Method is thread runner>,0.0
+<Parameter to sink method save>,0.0
+<Parameter to sink method write>,0.0
+<Method name starts with handle>,1.0
+<Method starting with 'insert' invoked>,0.0
+<Value from source method is to return>,0.0
+<Method is part of class android.app.Service>,1.0
+<Parameter type contains writer>,0.0
+<Value from source method obtainMessage to return>,0.0
+<Parameter to sink method send>,0.0
+<Parameter to sink method put>,0.0
+<Parameter to sink method adjust>,0.0
+<Parameter to sink method update>,0.0
+<Parameter to sink method perform>,0.0
+<Method name starts with <init>>,0.0
+<Parameter to sink method delete>,0.0
+<Return type is byte[]>,0.0
+<Method is lone getter or setter>,0.0
+<Return type is android.net.Uri>,1.0
+<Method name starts with is>,1.0
+<Method modifier is PROTECTED>,0.0
+<Method is part of class android.app.ContentProvider>,0.0
+<Method name starts with supply>,0.0
+<Parameter to sink method dump>,0.0
+<Method name starts with dump>,0.0
+<Parameter to sink method disable>,0.0
+<Value from source method get to return>,0.0
+<Parameter type contains com.android.inputmethod.keyboard.key>,0.0
+<Parameter to sink method dial>,0.0
+<Parameter to sink method restore>,0.0
+<Parameter to sink method set>,0.0
+<Return type is boolean>,0.0
+<Parameter to sink method transact>,0.0
+<Method name starts with perform>,1.0
+<Parameter to sink method sync>,0.0
+<Parameter to sink method dispatch>,0.0
+<Parameter to sink method setup>,0.0
+<Value from source method create to return>,0.0
+<Method is part of a STATIC class>,0.0
+<Parameter to sink method bind>,0.0
+<Method name starts with do>,1.0
+<Base name of class package name: music>,0.0
+<Parameter to sink method create>,0.0
+<Value from source method query to return>,0.0
+<Value from source method writeToParcel to return>,0.0
+<Parameter to sink method show>,0.0
+<Parameter to sink method notify>,0.0
+<Return type is com.android.internal.telephony.Connection>,0.0
+<Method name starts with note>,1.0
+<Method is part of a PRIVATE class>,0.0

@@ -1,0 +1,733 @@
+,New Annotation,Description,Parameters,Return,ClassDescription,PackageDescription
+"<android.test.ProviderTestCase: ContentResolver newResolverWithContentProviderFromSql(Context,Class,String,String,int,String)>",SOURCE,,"targetContext Context |||
+providerClass Class |||
+authority String |||
+databaseName String |||
+databaseVersion int |||
+sql String |||",ContentResolver |||,"If you would like to test a single content provider with an
+  InstrumentationTestCase  this provides some of the boiler plate in  setUp()  and
+  tearDown() .",
+<android.os.Bundle: byte getByte(String)>,NEITHER,"Returns the value associated with the given key or (byte) 0 if
+ no mapping of the desired type exists for the given key.",key String : a String |||,byte a byte value |||,A mapping from String keys to various  Parcelable  values.,
+"<android.content.Intent: Intent putExtra(String,byte)>",NEITHER,"Add extended data to the intent.  The name must include a package
+ prefix for example the app com.android.contacts would use names
+ like ""com.android.contacts.ShowAll"".","name String : The name of the extra data with package prefix. |||
+value byte : The byte data value. |||","Intent Returns the same Intent object for chaining multiple calls
+ into a single statement.
+
+ This value will never be null . |||","An intent is an abstract description of an operation to be performed.  It
+ can be used with  Context#startActivity(Intent)  to
+ launch an  Activity 
+  broadcastIntent  to
+ send it to any interested  BroadcastReceiver  components
+ and  Context.startService(Intent)  or
+  Context.bindService(Intent ServiceConnection int)  to communicate with a
+ background  Service .
+
+  An Intent provides a facility for performing late runtime binding between the code in
+ different applications. Its most significant use is in the launching of activities where it
+ can be thought of as the glue between activities. It is basically a passive data structure
+ holding an abstract description of an action to be performed.","Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+<android.webkit.WebView: void setCertificate(SslCertificate)>,SINK,"This method was deprecated
+      in API level 17. Calling this function has no useful effect and will be
+ ignored in future releases. Sets the SSL certificate for the main top-level page.",certificate SslCertificate |||,void,"A View that displays web pages.
+
+  Basic usage In most cases we recommend using a standard web browser like Chrome to deliver
+ content to the user. To learn more about web browsers read the guide on
+  
+ invoking a browser with an intent .
+
+  WebView objects allow you to display web content as part of your activity layout but
+ lack some of the features of fully-developed browsers. A WebView is useful when
+ you need increased control over the UI and advanced configuration options that will allow
+ you to embed web pages in a specially-designed environment for your app.
+
+  To learn more about WebView and alternatives for serving web content read the
+ documentation on
+  
+ Web-based content .","Provides tools for browsing the web.
+  For more information about building apps with web-based content see the
+  Web Apps Overview ."
+"<android.accounts.AccountManager: void invalidateAuthToken(String,String)>",NEITHER,"Removes an auth token from the AccountManager's cache.  Does nothing if
+ the auth token is not currently in the cache.  Applications must call this
+ method when the auth token is found to have expired or otherwise become
+ invalid for authenticating requests.  The AccountManager does not validate
+ or expire cached auth tokens otherwise. It is safe to call this method from the main thread. NOTE: If targeting your app to work on API level 22 and before
+ MANAGE_ACCOUNTS or USE_CREDENTIALS permission is needed for those
+ platforms. See docs for this function in API level 22. Requires android.Manifest.permission.MANAGE_ACCOUNTS or android.Manifest.permission.USE_CREDENTIALS","accountType String : The account type of the auth token to invalidate must not be null |||
+authToken String : The auth token to invalidate may be null |||",void,"This class provides access to a centralized registry of the user's
+ online accounts.  The user enters credentials (username and password) once
+ per account granting applications access to online resources with
+ ""one-click"" approval.
+
+  Different online services have different ways of handling accounts and
+ authentication so the account manager uses pluggable  authenticator 
+ modules for different  account types .  Authenticators (which may be
+ written by third parties) handle the actual details of validating account
+ credentials and storing account information.  For example Google Facebook
+ and Microsoft Exchange each have their own authenticator.
+
+  Many servers support some notion of an  authentication token 
+ which can be used to authenticate a request to the server without sending
+ the user's actual password.  (Auth tokens are normally created with a
+ separate request which does include the user's credentials.)  AccountManager
+ can generate auth tokens for applications so the application doesn't need to
+ handle passwords directly.  Auth tokens are normally reusable and cached by
+ AccountManager but must be refreshed periodically.  It's the responsibility
+ of applications to  invalidate  auth tokens when they stop working so
+ the AccountManager knows it needs to regenerate them.
+
+  Applications accessing a server normally go through these steps:
+
+  Get an instance of AccountManager using  get(android.content.Context) .
+
+  List the available accounts using  getAccountsByType(String)  or
+  getAccountsByTypeAndFeatures(String String[] AccountManagerCallback  Handler) .  Normally applications will only
+ be interested in accounts with one particular  type  which
+ identifies the authenticator.  Account  features  are used to
+ identify particular account subtypes and capabilities.  Both the account
+ type and features are authenticator-specific strings and must be known by
+ the application in coordination with its preferred authenticators.
+
+  Select one or more of the available accounts possibly by asking the
+ user for their preference.  If no suitable accounts are available
+  addAccount(String String String[] Bundle Activity AccountManagerCallback  Handler)  may be called to prompt the user to create an
+ account of the appropriate type.
+
+  Important:  If the application is using a previously remembered
+ account selection it must make sure the account is still in the list
+ of accounts returned by  getAccountsByType(String) .  Requesting an auth token
+ for an account no longer on the device results in an undefined failure.
+
+  Request an auth token for the selected account(s) using one of the
+  getAuthToken(Account String Bundle Activity AccountManagerCallback  Handler)  methods or related helpers.  Refer to the description
+ of each method for exact usage and error handling details.
+
+  Make the request using the auth token.  The form of the auth token
+ the format of the request and the protocol used are all specific to the
+ service you are accessing.  The application may use whatever network and
+ protocol libraries are useful.
+
+  Important:  If the request fails with an authentication error
+ it could be that a cached auth token is stale and no longer honored by
+ the server.  The application must call  invalidateAuthToken(String String)  to remove
+ the token from the cache otherwise requests will continue failing!  After
+ invalidating the auth token immediately go back to the ""Request an auth
+ token"" step above.  If the process fails the second time then it can be
+ treated as a ""genuine"" authentication failure and the user notified or other
+ appropriate actions taken.
+  Some AccountManager methods may need to interact with the user to
+ prompt for credentials present options or ask the user to add an account.
+ The caller may choose whether to allow AccountManager to directly launch the
+ necessary user interface and wait for the user or to return an Intent which
+ the caller may use to launch the interface or (in some cases) to install a
+ notification which the user can select at any time to launch the interface.
+ To have AccountManager launch the interface directly the caller must supply
+ the current foreground  Activity  context.
+
+  Many AccountManager methods take  AccountManagerCallback  and
+  Handler  as parameters.  These methods return immediately and
+ run asynchronously. If a callback is provided then
+  AccountManagerCallback#run  will be invoked on the Handler's
+ thread when the request completes successfully or not.
+ The result is retrieved by calling  AccountManagerFuture#getResult() 
+ on the  AccountManagerFuture  returned by the method (and also passed
+ to the callback).  This method waits for the operation to complete (if
+ necessary) and either returns the result or throws an exception if an error
+ occurred during the operation.  To make the request synchronously call
+  AccountManagerFuture#getResult()  immediately on receiving the
+ future from the method; no callback need be supplied.
+
+  Requests which may block including
+  AccountManagerFuture#getResult()  must never be called on
+ the application's main event thread.  These operations throw
+  IllegalStateException  if they are used on the main thread.",
+"<android.view.textservice.SpellCheckerSubtype: CharSequence getDisplayName(Context,String,ApplicationInfo)>",NEITHER,,"context Context : Context will be used for getting Locale and PackageManager. |||
+packageName String : The package name of the spell checker |||
+appInfo ApplicationInfo : The application info of the spell checker |||","CharSequence a display name for this subtype. The string resource of the label (mSubtypeNameResId)
+ can have only one %s in it. If there is the %s part will be replaced with the locale's
+ display name by the formatter. If there is not this method simply returns the string
+ specified by mSubtypeNameResId. If mSubtypeNameResId is not specified (== 0) it's up to the
+ framework to generate an appropriate display name. |||","This class is used to specify meta information of a subtype contained in a spell checker.
+ Subtype can describe locale (e.g. en_US fr_FR...) used for settings.",
+"<android.webkit.WebView: void postUrl(String,byte)>",SINK,"Loads the URL with postData using ""POST"" method into this WebView. If url
+ is not a network URL it will be loaded with loadUrl(java.lang.String) instead ignoring the postData param.","url String : the URL of the resource to load
+This value must never be null . |||
+postData byte : the data will be passed to ""POST"" request which must be
+be ""application/x-www-form-urlencoded"" encoded.
+This value must never be null . |||",void,"A View that displays web pages.
+
+  Basic usage In most cases we recommend using a standard web browser like Chrome to deliver
+ content to the user. To learn more about web browsers read the guide on
+  
+ invoking a browser with an intent .
+
+  WebView objects allow you to display web content as part of your activity layout but
+ lack some of the features of fully-developed browsers. A WebView is useful when
+ you need increased control over the UI and advanced configuration options that will allow
+ you to embed web pages in a specially-designed environment for your app.
+
+  To learn more about WebView and alternatives for serving web content read the
+ documentation on
+  
+ Web-based content .","Provides tools for browsing the web.
+  For more information about building apps with web-based content see the
+  Web Apps Overview ."
+<android.content.Intent: char getCharArrayExtra(String)>,NEITHER,Retrieve extended data from the intent.,name String : The name of the desired item. |||,"char[] the value of an item previously added with putExtra()
+ or null if no char array value was found. |||","An intent is an abstract description of an operation to be performed.  It
+ can be used with  Context#startActivity(Intent)  to
+ launch an  Activity 
+  broadcastIntent  to
+ send it to any interested  BroadcastReceiver  components
+ and  Context.startService(Intent)  or
+  Context.bindService(Intent ServiceConnection int)  to communicate with a
+ background  Service .
+
+  An Intent provides a facility for performing late runtime binding between the code in
+ different applications. Its most significant use is in the launching of activities where it
+ can be thought of as the glue between activities. It is basically a passive data structure
+ holding an abstract description of an action to be performed.","Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+"<android.content.ContentResolver: Cursor query(Uri,String,String,String,String,CancellationSignal)>",SOURCE,"Query the given URI returning a Cursor over the result set
+ with optional support for cancellation. For best performance the caller should follow these guidelines: Provide an explicit projection to prevent
+ reading data from storage that aren't going to be used. 
+Use question mark parameter markers such as 'phone=?' instead of
+ explicit values in the selection parameter so that queries
+ that differ only by those values will be recognized as the same
+ for caching purposes.","uri Uri : The URI using the content:// scheme for the content to
+retrieve.
+This value must never be null . |||
+projection String : A list of which columns to return. Passing null will
+return all columns which is inefficient.
+This value may be null . |||
+selection String : A filter declaring which rows to return formatted as an
+SQL WHERE clause (excluding the WHERE itself). Passing null will
+return all rows for the given URI.
+This value may be null . |||
+selectionArgs String : You may include ?s in selection which will be
+replaced by the values from selectionArgs in the order that they
+appear in the selection. The values will be bound as Strings.
+This value may be null . |||
+sortOrder String : How to order the rows formatted as an SQL ORDER BY
+clause (excluding the ORDER BY itself). Passing null will use the
+default sort order which may be unordered.
+This value may be null . |||
+cancellationSignal CancellationSignal : A signal to cancel the operation in progress or null if none.
+If the operation is canceled then OperationCanceledException will be thrown
+when the query is executed.
+This value may be null . |||",Cursor A Cursor object which is positioned before the first entry. May return null if the underlying content provider returns null or if it crashes. |||,This class provides applications access to the content model.,"Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+<android.app.Activity: Object getSystemService(String)>,SOURCE,"Return the handle to a system-level service by name. The class of the
+ returned object varies by the requested name. Currently available names
+ are: Note:  System services obtained via this API may be closely associated with
+ the Context in which they are obtained from.  In general do not share the
+ service objects between various different contexts (Activities Applications
+ Services Providers etc.) Note: Instant apps for which PackageManager#isInstantApp() returns true
+ don't have access to the following system services: DEVICE_POLICY_SERVICE  FINGERPRINT_SERVICE  KEYGUARD_SERVICE  SHORTCUT_SERVICE  USB_SERVICE  WALLPAPER_SERVICE  WIFI_P2P_SERVICE  WIFI_SERVICE  WIFI_AWARE_SERVICE . For these services this method will
+ return null .  Generally if you are running as an instant app you should always
+ check whether the result of this method is null . Note: When implementing this method keep in mind that new services can be added on newer
+ Android releases so if you're looking for just the explicit names mentioned above make sure
+ to return null when you don't recognize the name â€” if you throw a RuntimeException exception instead you're app might break on new Android releases.","name String : Value is Context.POWER_SERVICE  Context.WINDOW_SERVICE  Context.LAYOUT_INFLATER_SERVICE  Context.ACCOUNT_SERVICE  Context.ACTIVITY_SERVICE  Context.ALARM_SERVICE  Context.NOTIFICATION_SERVICE  Context.ACCESSIBILITY_SERVICE  Context.CAPTIONING_SERVICE  Context.KEYGUARD_SERVICE  Context.LOCATION_SERVICE  Context.SEARCH_SERVICE  Context.SENSOR_SERVICE android.content.Context.SENSOR_PRIVACY_SERVICE Context.STORAGE_SERVICE  Context.STORAGE_STATS_SERVICE  Context.WALLPAPER_SERVICE android.content.Context.TIME_ZONE_RULES_MANAGER_SERVICE Context.VIBRATOR_SERVICE  Context.CONNECTIVITY_SERVICE  Context.IPSEC_SERVICE  Context.VPN_MANAGEMENT_SERVICE android.content.Context.TEST_NETWORK_SERVICE Context.NETWORK_STATS_SERVICE  Context.WIFI_SERVICE  Context.WIFI_AWARE_SERVICE  Context.WIFI_P2P_SERVICE android.content.Context.WIFI_SCANNING_SERVICE Context.WIFI_RTT_RANGING_SERVICE  Context.NSD_SERVICE  Context.AUDIO_SERVICE android.content.Context.AUTH_SERVICE Context.FINGERPRINT_SERVICE  Context.BIOMETRIC_SERVICE  Context.MEDIA_ROUTER_SERVICE  Context.TELEPHONY_SERVICE  Context.TELEPHONY_SUBSCRIPTION_SERVICE  Context.CARRIER_CONFIG_SERVICE  Context.EUICC_SERVICE  Context.MMS_SERVICE  Context.TELECOM_SERVICE  Context.CLIPBOARD_SERVICE  Context.INPUT_METHOD_SERVICE  Context.TEXT_SERVICES_MANAGER_SERVICE  Context.TEXT_CLASSIFICATION_SERVICE  Context.APPWIDGET_SERVICE android.content.Context.ROLLBACK_SERVICE Context.DROPBOX_SERVICE  Context.DEVICE_POLICY_SERVICE  Context.UI_MODE_SERVICE  Context.DOWNLOAD_SERVICE  Context.NFC_SERVICE  Context.BLUETOOTH_SERVICE  Context.USB_SERVICE  Context.LAUNCHER_APPS_SERVICE  Context.INPUT_SERVICE  Context.DISPLAY_SERVICE  Context.USER_SERVICE  Context.RESTRICTIONS_SERVICE  Context.APP_OPS_SERVICE  Context.ROLE_SERVICE  Context.CAMERA_SERVICE  Context.PRINT_SERVICE  Context.CONSUMER_IR_SERVICE  Context.TV_INPUT_SERVICE  Context.USAGE_STATS_SERVICE  Context.MEDIA_SESSION_SERVICE  Context.BATTERY_SERVICE  Context.JOB_SCHEDULER_SERVICE  Context.MEDIA_PROJECTION_SERVICE  Context.MIDI_SERVICE android.content.Context.RADIO_SERVICE Context.HARDWARE_PROPERTIES_SERVICE  Context.SHORTCUT_SERVICE  Context.SYSTEM_HEALTH_SERVICE  Context.COMPANION_DEVICE_SERVICE  Context.CROSS_PROFILE_APPS_SERVICE android.content.Context.PERMISSION_SERVICE or android.content.Context.LIGHTS_SERVICE
+This value must never be null . |||",Object The service or null if the name does not exist. |||,"An activity is a single focused thing that the user can do.  Almost all
+ activities interact with the user so the Activity class takes care of
+ creating a window for you in which you can place your UI with
+  setContentView(View) .  While activities are often presented to the user
+ as full-screen windows they can also be used in other ways: as floating
+ windows (via a theme with  R.attr.windowIsFloating  set)
+  
+ Multi-Window mode  or embedded into other windows.
+
+ There are two methods almost all subclasses of Activity will implement:
+
+  onCreate(Bundle)  is where you initialize your activity.  Most
+     importantly here you will usually call  setContentView(int) 
+     with a layout resource defining your UI and using  findViewById(int) 
+     to retrieve the widgets in that UI that you need to interact with
+     programmatically.
+
+      onPause()  is where you deal with the user pausing active
+     interaction with the activity. Any changes made by the user should at
+     this point be committed (usually to the
+      ContentProvider  holding the data). In this
+     state the activity is still visible on screen.
+  To be of use with  Context.startActivity()  all
+ activity classes must have a corresponding
+  <activity> 
+ declaration in their package's  AndroidManifest.xml . Topics covered here:
+  Fragments Activity Lifecycle Configuration Changes Starting Activities and Getting Results Saving Persistent State Permissions Process Lifecycle","Contains high-level classes encapsulating the overall Android application model. An Android application is defined using one or more of Android's four core application
+ components. Two such application components are defined in this package:  Activity  and  Service . The other two components are from the  android.content  package:  BroadcastReceiver  and  ContentProvider . An  Activity  is an application component that provides a screen with which
+ users can interact in order to do something such as dial the phone take a photo send an email or
+ view a map. An activity can start other activities including activities that live in separate
+ applications. A  Service  is an application component that can perform
+ long-running operations in the background without a user interface. For example a service
+ can handle network transactions play music or work with a content provider without the user being
+ aware of the work going on. The  Fragment  class is also an important part of an application's
+ designâ€”especially when designing for large screen devices such as tablets. A fragment defines
+ a distinct part of an activity's behavior including the associated UI. It has its own lifecycle
+ that is similar to that of the activity and can exist alongside other fragments that are embedded in
+ the activity. While an activity is running you can add and remove fragments and include each
+ fragment in a back stack that's managed by the activityâ€”allowing the user to navigate
+ backwards through the fragment states without leaving the activity. This package also defines application utilities such as dialogs notifications and the
+ action bar. For information about using some the classes in this package see the following
+ documents:  Activities   Services   Fragments   Using the Action Bar   Creating Dialogs  and  Notifying the User ."
+"<android.os.DropBoxManager: void addText(String,String)>",SINK,"Stores human-readable text.  The data may be discarded eventually (or even
+ immediately) if space is limited or ignored entirely if the tag has been
+ blocked (see isTagEnabled(String) ).","tag String : describing the type of entry being stored |||
+data String : value to store |||",void,"Enqueues chunks of data (from various sources -- application crashes kernel
+ log records etc.).  The queue is size bounded and will drop old data if the
+ enqueued data exceeds the maximum size.  You can think of this as a
+ persistent system-wide blob-oriented ""logcat"".
+
+  DropBoxManager entries are not sent anywhere directly but other system
+ services and debugging tools may scan and upload entries for processing.",
+"<android.nfc.NfcAdapter: void setNdefPushMessage(NdefMessage,Activity,Activity)>",SINK,"This method was deprecated
+      in API level 29. this feature is deprecated. File sharing can work using other technology like
+ Bluetooth. Set a static NdefMessage to send using Android Beam (TM). This method may be called at any time before Activity#onDestroy but the NDEF message is only made available for NDEF push when the
+ specified activity(s) are in resumed (foreground) state. The recommended
+ approach is to call this method during your Activity's Activity#onCreate - see sample
+ code below. This method does not immediately perform any I/O or blocking work
+ so is safe to call on your main thread. Only one NDEF message can be pushed by the currently resumed activity.
+ If both setNdefPushMessage(NdefMessage Activity Activity...) and setNdefPushMessageCallback(NfcAdapter.CreateNdefMessageCallback Activity Activity...) are set then
+ the callback will take priority. If neither setNdefPushMessage(NdefMessage Activity Activity...) or setNdefPushMessageCallback(NfcAdapter.CreateNdefMessageCallback Activity Activity...) have been called for your activity then
+ the Android OS may choose to send a default NDEF message on your behalf
+ such as a URI for your application. If setNdefPushMessage(NdefMessage Activity Activity...) is called with a null NDEF message
+ and/or setNdefPushMessageCallback(NfcAdapter.CreateNdefMessageCallback Activity Activity...) is called with a null callback
+ then NDEF push will be completely disabled for the specified activity(s).
+ This also disables any default NDEF message the Android OS would have
+ otherwise sent on your behalf for those activity(s). If you want to prevent the Android OS from sending default NDEF
+ messages completely (for all activities) you can include a <meta-data> element inside the <application> element of your AndroidManifest.xml file like this: The API allows for multiple activities to be specified at a time
+ but it is strongly recommended to just register one at a time
+ and to do so during the activity's Activity#onCreate . For example: If your Activity wants to dynamically generate an NDEF message
+ then set a callback using setNdefPushMessageCallback(NfcAdapter.CreateNdefMessageCallback Activity Activity...) instead
+ of a static message. Do not pass in an Activity that has already been through Activity#onDestroy . This is guaranteed if you call this API
+ during Activity#onCreate . For sending large content such as pictures and songs
+ consider using setBeamPushUris(Uri[] Activity) which switches to alternate transports
+ such as Bluetooth to achieve a fast transfer rate. Requires the Manifest.permission.NFC permission.","message NdefMessage : NDEF message to push over NFC or null to disable |||
+activity Activity : activity for which the NDEF message will be pushed |||
+activities Activity : optional additional activities however we strongly recommend
+to only register one at a time and to do so in that activity's Activity#onCreate |||",void,"Represents the local NFC adapter.
+  
+ Use the helper  getDefaultAdapter(android.content.Context)  to get the default NFC
+ adapter for this Android device.","Provides access to Near Field Communication (NFC) functionality allowing applications to read
+ NDEF message in NFC tags. A ""tag"" may actually be another device that appears as a tag. For more information see the
+  Near Field Communication  guide. Here's a summary of the classes: NfcManager This is the high level manager used to obtain this device's  NfcAdapter . You can
+ acquire an instance using  getSystemService(Class ) . NfcAdapter This represents the device's NFC adapter which is your entry-point to performing NFC
+ operations. You can acquire an instance with  getDefaultAdapter()  or
+  getDefaultAdapter(android.content.Context) . NdefMessage Represents an NDEF data message which is the standard format in which ""records""
+ carrying data are transmitted between devices and tags. Your application can receive these
+ messages from an  ACTION_TAG_DISCOVERED  intent. NdefRecord Represents a record which is delivered in a  NdefMessage  and describes the
+ type of data being shared and carries the data itself. Note: 
+ Not all Android-powered devices provide NFC functionality."
+<android.os.Parcel: ArrayList readArrayList(ClassLoader)>,NEITHER,"Read and return a new ArrayList object from the parcel at the current
+ dataPosition().  Returns null if the previously written list object was
+ null.  The given class loader will be used to load any enclosed
+ Parcelables.",loader ClassLoader : This value may be null . |||,ArrayList |||,"Container for a message (data and object references) that can
+ be sent through an IBinder.  A Parcel can contain both flattened data
+ that will be unflattened on the other side of the IPC (using the various
+ methods here for writing specific types or the general
+  Parcelable  interface) and references to live  IBinder 
+ objects that will result in the other side receiving a proxy IBinder
+ connected with the original IBinder in the Parcel.
+
+  Parcel is  not  a general-purpose
+ serialization mechanism.  This class (and the corresponding
+  Parcelable  API for placing arbitrary objects into a Parcel) is
+ designed as a high-performance IPC transport.  As such it is not
+ appropriate to place any Parcel data in to persistent storage: changes
+ in the underlying implementation of any of the data in the Parcel can
+ render older data unreadable. The bulk of the Parcel API revolves around reading and writing data
+ of various types.  There are six major classes of such functions available. Primitives The most basic data functions are for writing and reading primitive
+ data types:  writeByte(byte)   readByte()   writeDouble(double) 
+  readDouble()   writeFloat(float)   readFloat()   writeInt(int) 
+  readInt()   writeLong(long)   readLong() 
+  writeString(String)   readString() .  Most other
+ data operations are built on top of these.  The given data is written and
+ read using the endianess of the host CPU. Primitive Arrays There are a variety of methods for reading and writing raw arrays
+ of primitive objects which generally result in writing a 4-byte length
+ followed by the primitive data items.  The methods for reading can either
+ read the data into an existing array or create and return a new array.
+ These available types are: writeBooleanArray(boolean[]) 
+  readBooleanArray(boolean[])   createBooleanArray() writeByteArray(byte[]) 
+  writeByteArray(byte[] int int)   readByteArray(byte[]) 
+  createByteArray() writeCharArray(char[])   readCharArray(char[]) 
+  createCharArray() writeDoubleArray(double[])   readDoubleArray(double[]) 
+  createDoubleArray() writeFloatArray(float[])   readFloatArray(float[]) 
+  createFloatArray() writeIntArray(int[])   readIntArray(int[]) 
+  createIntArray() writeLongArray(long[])   readLongArray(long[]) 
+  createLongArray() writeStringArray(java.lang.String[])   readStringArray(java.lang.String[]) 
+  createStringArray() .
+  writeSparseBooleanArray(android.util.SparseBooleanArray) 
+  readSparseBooleanArray() .
+  Parcelables The  Parcelable  protocol provides an extremely efficient (but
+ low-level) protocol for objects to write and read themselves from Parcels.
+ You can use the direct methods  writeParcelable(android.os.Parcelable int) 
+ and  readParcelable(java.lang.ClassLoader)  or
+  writeParcelableArray(T[] int)  and
+  readParcelableArray(java.lang.ClassLoader)  to write or read.  These
+ methods write both the class type and its data to the Parcel allowing
+ that class to be reconstructed from the appropriate class loader when
+ later reading. There are also some methods that provide a more efficient way to work
+ with Parcelables:  writeTypedObject(T int)   writeTypedArray(T[] int) 
+  writeTypedList(List )   readTypedObject(Parcelable.Creator ) 
+  createTypedArray(Parcelable.Creator )  and  createTypedArrayList(Parcelable.Creator ) .  These methods
+ do not write the class information of the original object: instead the
+ caller of the read function must know what type to expect and pass in the
+ appropriate  Parcelable.Creator  instead to
+ properly construct the new object and read its data.  (To more efficient
+ write and read a single Parcelable object that is not null you can directly
+ call  Parcelable#writeToParcel  and
+  Parcelable.Creator#createFromParcel 
+ yourself.) Bundles A special type-safe container called  Bundle  is available
+ for key/value maps of heterogeneous values.  This has many optimizations
+ for improved performance when reading and writing data and its type-safe
+ API avoids difficult to debug type errors when finally marshalling the
+ data contents into a Parcel.  The methods to use are
+  writeBundle(android.os.Bundle)   readBundle()  and
+  readBundle(java.lang.ClassLoader) .
+
+  Active Objects An unusual feature of Parcel is the ability to read and write active
+ objects.  For these objects the actual contents of the object is not
+ written rather a special token referencing the object is written.  When
+ reading the object back from the Parcel you do not get a new instance of
+ the object but rather a handle that operates on the exact same object that
+ was originally written.  There are two forms of active objects available. Binder  objects are a core facility of Android's general cross-process
+ communication system.  The  IBinder  interface describes an abstract
+ protocol with a Binder object.  Any such interface can be written in to
+ a Parcel and upon reading you will receive either the original object
+ implementing that interface or a special proxy implementation
+ that communicates calls back to the original object.  The methods to use are
+  writeStrongBinder(android.os.IBinder) 
+  writeStrongInterface(android.os.IInterface)   readStrongBinder() 
+  writeBinderArray(android.os.IBinder[])   readBinderArray(android.os.IBinder[]) 
+  createBinderArray() 
+  writeBinderList(java.util.List)   readBinderList(java.util.List) 
+  createBinderArrayList() . FileDescriptor objects representing raw Linux file descriptor identifiers
+ can be written and  ParcelFileDescriptor  objects returned to operate
+ on the original file descriptor.  The returned file descriptor is a dup
+ of the original file descriptor: the object and fd is different but
+ operating on the same underlying file stream with the same position etc.
+ The methods to use are  writeFileDescriptor(java.io.FileDescriptor) 
+  readFileDescriptor() .
+
+  Untyped Containers A final class of methods are for writing and reading standard Java
+ containers of arbitrary types.  These all revolve around the
+  writeValue(java.lang.Object)  and  readValue(java.lang.ClassLoader)  methods
+ which define the types of objects allowed.  The container methods are
+  writeArray(java.lang.Object[])   readArray(java.lang.ClassLoader) 
+  writeList(java.util.List)   readList(java.util.List java.lang.ClassLoader) 
+  readArrayList(java.lang.ClassLoader) 
+  writeMap(java.util.Map)   readMap(java.util.Map java.lang.ClassLoader) 
+  writeSparseArray(android.util.SparseArray) 
+  readSparseArray(java.lang.ClassLoader) .",
+<android.content.Context: CharSequence getText(int)>,NEITHER,"Return a localized styled CharSequence from the application's package's
+ default string table.",resId int : Resource id for the CharSequence text |||,CharSequence This value will never be null . |||,"Interface to global information about an application environment.  This is
+ an abstract class whose implementation is provided by
+ the Android system.  It
+ allows access to application-specific resources and classes as well as
+ up-calls for application-level operations such as launching activities
+ broadcasting and receiving intents etc.","Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+"<android.provider.Browser: void sendString(Context,String)>",SINK,"Sends the given string using an Intent with Intent#ACTION_SEND and a mime type
+ of text/plain. The string is put into Intent#EXTRA_TEXT .","context Context : the context used to start the activity |||
+string String : the string to send |||",void,,"Provides convenience classes to access the content providers supplied by
+ Android. Android ships with a number of content providers that store common data such
+ as contact informations calendar information and media files. These classes
+ provide simplified methods of adding or retrieving data from these content
+ providers. For information about how to use a content provider see the  Content Providers  developer
+ guide."
+<android.net.sip.SipAudioCall: void sendDtmf(int)>,SINK,"Sends a DTMF code. According to RFC 2883 event 0--9 maps to decimal
+ value 0--9 '*' to 10 '#' to 11 event 'A'--'D' to 12--15 and event
+ flash to 16. Currently event flash is not supported.","code int : the DTMF code to send. Value 0 to 15 (inclusive) are valid
+inputs. |||",void,"Handles an Internet audio call over SIP. You can instantiate this class with  SipManager 
+ using  SipManager#makeAudioCall  and   SipManager#takeAudioCall .
+
+  Note:  Using this class require the
+    Manifest.permission.INTERNET  and
+    Manifest.permission.USE_SIP  permissions. In addition  startAudio()  requires the
+    Manifest.permission.RECORD_AUDIO 
+    Manifest.permission.ACCESS_WIFI_STATE  and
+    Manifest.permission.WAKE_LOCK  permissions; and  setSpeakerMode()  requires the
+    Manifest.permission.MODIFY_AUDIO_SETTINGS  permission.",
+"<android.content.ContextWrapper: void sendBroadcastAsUser(Intent,UserHandle)>",SINK,"Version of sendBroadcast(android.content.Intent) that allows you to specify the
+ user the broadcast will be sent to.  This is not available to applications
+ that are not pre-installed on the system image. Requires android.Manifest.permission.INTERACT_ACROSS_USERS","intent Intent : The intent to broadcast |||
+user UserHandle : UserHandle to send the intent to. |||",void,"Proxying implementation of Context that simply delegates all of its calls to
+ another Context.  Can be subclassed to modify behavior without changing
+ the original Context.","Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+<android.telephony.gsm.SmsManager: ArrayList divideMessage(String)>,NEITHER,"This method was deprecated
+      in API level 4. Use android.telephony.SmsManager. Divide a text message into several messages none bigger than
+ the maximum SMS message size.",text String : the original message.  Must not be null. |||,"ArrayList < String > an ArrayList of strings that in order
+   comprise the original message |||","Manages SMS operations such as sending data text and pdu SMS messages.
+ Get this object by calling the static method SmsManager.getDefault().",
+<android.nfc.tech.NfcA: NfcA get(Tag)>,SOURCE,"Get an instance of NfcA for the given tag. Returns null if NfcA was not enumerated in Tag#getTechList .
+ This indicates the tag does not support NFC-A. Does not cause any RF activity and does not block.",tag Tag : an NFC-A compatible tag |||,NfcA NFC-A object |||,"Provides access to NFC-A (ISO 14443-3A) properties and I/O operations on a  Tag .
+
+  Acquire a  NfcA  object using  get(Tag) .
+  The primary NFC-A I/O operation is  transceive(byte[]) . Applications must
+ implement their own protocol stack on top of  transceive(byte[]) .
+
+  Note:  Methods that perform I/O operations
+ require the  Manifest.permission.NFC  permission.","These classes provide access to a tag technology's features which vary by the type
+ of tag that is scanned. A scanned tag can support multiple technologies and you can find
+ out what they are by calling  getTechList() . For more information on dealing with tag technologies and handling the ones that you care about see
+  The Tag Dispatch System .
+ The  TagTechnology  interface provides an overview of the
+ supported technologies."
+"<android.content.ContentProviderClient: ParcelFileDescriptor openFile(Uri,String)>",SOURCE,"See ContentProvider#openFile .  Note that
+ this does not take care of non-content: URIs such as file:.  It is strongly recommended
+ you use the ContentResolver#openFileDescriptor API instead.","url Uri : This value must never be null . |||
+mode String : This value must never be null . |||",ParcelFileDescriptor This value may be null . |||,"Content providers are one of the primary building blocks of Android applications providing
+ content to applications. They encapsulate data and provide it to applications through the single
+  ContentResolver  interface. A content provider is only required if you need to share
+ data between multiple applications. For example the contacts data is used by multiple
+ applications and must be stored in a content provider. If you don't need to share data amongst
+ multiple applications you can use a database directly via
+  SQLiteDatabase .
+
+  When a request is made via
+ a  ContentResolver  the system inspects the authority of the given URI and passes the
+ request to the content provider registered with the authority. The content provider can interpret
+ the rest of the URI however it wants. The  UriMatcher  class is helpful for parsing
+ URIs. The primary methods that need to be implemented are:
+  onCreate()  which is called to initialize the provider query(Uri String[] Bundle CancellationSignal)  which returns data to the caller insert(Uri ContentValues)  which inserts new data into the content provider update(Uri ContentValues String String[])  which updates existing data in the content provider delete(Uri String String[])  which deletes data from the content provider getType(Uri)  which returns the MIME type of data in the content provider Requests to  ContentResolver  are automatically forwarded to the appropriate
+ ContentProvider instance so subclasses don't have to worry about the details of
+ cross-process calls.","Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+<android.preference.PreferenceFragment: void onStop()>,NEITHER,"Called when the Fragment is no longer started.  This is generally
+ tied to Activity#onStop() of the containing
+ Activity's lifecycle. If you override this method you must call through to the
+ superclass implementation.",,void,"Represents the basic Preference UI building
+ block displayed by a  PreferenceActivity  in the form of a
+  ListView . This class provides the  View  to be displayed in
+ the activity and associates with a  SharedPreferences  to
+ store/retrieve the preference data.
+  
+ When specifying a preference hierarchy in XML each element can point to a
+ subclass of  Preference  similar to the view hierarchy and layouts.
+  
+ This class contains a  key  that will be used as the key into the
+  SharedPreferences . It is up to the subclass to decide how to store
+ the value.",
+<android.content.ContentResolver: OutputStream openOutputStream(Uri)>,SOURCE,"Synonym for openOutputStream(uri ""w"") .",uri Uri : This value must never be null . |||,OutputStream This value may be null . |||,This class provides applications access to the content model.,"Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+<android.app.IntentService: void onCreate()>,NEITHER,Called by the system when the service is first created.  Do not call this method directly.,,void,"IntentService is a base class for  Service s that handle asynchronous
+ requests (expressed as  Intent s) on demand.  Clients send requests
+ through  Context.startService(Intent)  calls; the
+ service is started as needed handles each Intent in turn using a worker
+ thread and stops itself when it runs out of work.
+
+  This ""work queue processor"" pattern is commonly used to offload tasks
+ from an application's main thread.  The IntentService class exists to
+ simplify this pattern and take care of the mechanics.  To use it extend
+ IntentService and implement  onHandleIntent(android.content.Intent) .  IntentService
+ will receive the Intents launch a worker thread and stop the service as
+ appropriate.
+
+  All requests are handled on a single worker thread -- they may take as
+ long as necessary (and will not block the application's main loop) but
+ only one request will be processed at a time.
+
+  Note:  IntentService is subject to all the
+  background execution limits 
+ imposed with Android 8.0 (API level 26). In most cases you are better off
+ using  JobIntentService  which uses jobs
+ instead of services when running on Android 8.0 or higher.","Contains high-level classes encapsulating the overall Android application model. An Android application is defined using one or more of Android's four core application
+ components. Two such application components are defined in this package:  Activity  and  Service . The other two components are from the  android.content  package:  BroadcastReceiver  and  ContentProvider . An  Activity  is an application component that provides a screen with which
+ users can interact in order to do something such as dial the phone take a photo send an email or
+ view a map. An activity can start other activities including activities that live in separate
+ applications. A  Service  is an application component that can perform
+ long-running operations in the background without a user interface. For example a service
+ can handle network transactions play music or work with a content provider without the user being
+ aware of the work going on. The  Fragment  class is also an important part of an application's
+ designâ€”especially when designing for large screen devices such as tablets. A fragment defines
+ a distinct part of an activity's behavior including the associated UI. It has its own lifecycle
+ that is similar to that of the activity and can exist alongside other fragments that are embedded in
+ the activity. While an activity is running you can add and remove fragments and include each
+ fragment in a back stack that's managed by the activityâ€”allowing the user to navigate
+ backwards through the fragment states without leaving the activity. This package also defines application utilities such as dialogs notifications and the
+ action bar. For information about using some the classes in this package see the following
+ documents:  Activities   Services   Fragments   Using the Action Bar   Creating Dialogs  and  Notifying the User ."
+"<android.content.SearchRecentSuggestionsProvider: int delete(Uri,String,String)>",NEITHER,"This method is provided for use by the ContentResolver.  Do not override or directly
+ call from your own code.","uri Uri : The full URI to query including a row ID (if a specific
+record is requested).
+This value must never be null . |||
+selection String : An optional restriction to apply to rows when deleting.
+This value may be null . |||
+selectionArgs String : This value may be null . |||",int The number of rows affected. |||,"This superclass can be used to create a simple search suggestions provider for your application.
+ It creates suggestions (as the user types) based on recent queries and/or recent views.
+
+  In order to use this class you must do the following.
+
+  Implement and test query search as described in  SearchManager .  (This
+ provider will send any suggested queries via the standard
+  ACTION_SEARCH  Intent which you'll already
+ support once you have implemented and tested basic searchability.) Create a Content Provider within your application by extending
+  SearchRecentSuggestionsProvider .  The class you create will be
+ very simple - typically it will have only a constructor.  But the constructor has a very
+ important responsibility:  When it calls  setupSuggestions(java.lang.String int)  it
+  configures  the provider to match the requirements of your searchable activity. Create a manifest entry describing your provider.  Typically this would be as simple
+ as adding the following lines:
+  
+     <!-- Content provider for search suggestions -->
+     <provider android:name=""YourSuggestionProviderClass""
+               android:authorities=""your.suggestion.authority"" /> Please note that you  do not  instantiate this content provider directly from within
+ your code.  This is done automatically by the system Content Resolver when the search dialog
+ looks for suggestions. In order for the Content Resolver to do this you must update your searchable activity's
+ XML configuration file with information about your content provider.  The following additions
+ are usually sufficient:
+  
+     android:searchSuggestAuthority=""your.suggestion.authority""
+     android:searchSuggestSelection="" ? "" In your searchable activities capture any user-generated queries and record them
+ for future searches by calling  SearchRecentSuggestions.saveRecentQuery() .","Contains classes for accessing and publishing data on a device.  It includes three main
+ categories of APIs: Content sharing ( android.content ) For sharing content between application components. The most important classes are:
+      ContentProvider  and  ContentResolver 
+   for managing and publishing persistent data associated with an application. Intent  and  IntentFilter  for delivering
+   structured messages between different application componentsâ€”allowing components to initiate
+   other components and return results. Package management ( android.content.pm ) For accessing information about an Android package (an  .apk ) including information
+ about its activities permissions services signatures and providers. The most important class for
+ accessing this information is  PackageManager . Resource management ( android.content.res ) For retrieving resource data associated with an application such as strings drawables
+ media and device configuration details. The most important class for accessing this data is  Resources ."
+<android.app.Activity: ComponentName getCallingActivity()>,NEITHER,"Return the name of the activity that invoked this activity.  This is
+ who the data in setResult() will be sent to.  You
+ can use this information to validate that the recipient is allowed to
+ receive the data. Note: if the calling activity is not expecting a result (that is it
+ did not use the startActivityForResult(Intent int) form that includes a request code) then the calling package will be
+ null.",,"ComponentName The ComponentName of the activity that will receive your
+         reply or null if none. |||","An activity is a single focused thing that the user can do.  Almost all
+ activities interact with the user so the Activity class takes care of
+ creating a window for you in which you can place your UI with
+  setContentView(View) .  While activities are often presented to the user
+ as full-screen windows they can also be used in other ways: as floating
+ windows (via a theme with  R.attr.windowIsFloating  set)
+  
+ Multi-Window mode  or embedded into other windows.
+
+ There are two methods almost all subclasses of Activity will implement:
+
+  onCreate(Bundle)  is where you initialize your activity.  Most
+     importantly here you will usually call  setContentView(int) 
+     with a layout resource defining your UI and using  findViewById(int) 
+     to retrieve the widgets in that UI that you need to interact with
+     programmatically.
+
+      onPause()  is where you deal with the user pausing active
+     interaction with the activity. Any changes made by the user should at
+     this point be committed (usually to the
+      ContentProvider  holding the data). In this
+     state the activity is still visible on screen.
+  To be of use with  Context.startActivity()  all
+ activity classes must have a corresponding
+  <activity> 
+ declaration in their package's  AndroidManifest.xml . Topics covered here:
+  Fragments Activity Lifecycle Configuration Changes Starting Activities and Getting Results Saving Persistent State Permissions Process Lifecycle","Contains high-level classes encapsulating the overall Android application model. An Android application is defined using one or more of Android's four core application
+ components. Two such application components are defined in this package:  Activity  and  Service . The other two components are from the  android.content  package:  BroadcastReceiver  and  ContentProvider . An  Activity  is an application component that provides a screen with which
+ users can interact in order to do something such as dial the phone take a photo send an email or
+ view a map. An activity can start other activities including activities that live in separate
+ applications. A  Service  is an application component that can perform
+ long-running operations in the background without a user interface. For example a service
+ can handle network transactions play music or work with a content provider without the user being
+ aware of the work going on. The  Fragment  class is also an important part of an application's
+ designâ€”especially when designing for large screen devices such as tablets. A fragment defines
+ a distinct part of an activity's behavior including the associated UI. It has its own lifecycle
+ that is similar to that of the activity and can exist alongside other fragments that are embedded in
+ the activity. While an activity is running you can add and remove fragments and include each
+ fragment in a back stack that's managed by the activityâ€”allowing the user to navigate
+ backwards through the fragment states without leaving the activity. This package also defines application utilities such as dialogs notifications and the
+ action bar. For information about using some the classes in this package see the following
+ documents:  Activities   Services   Fragments   Using the Action Bar   Creating Dialogs  and  Notifying the User ."
+<android.app.ActivityManager: List getRunningAppProcesses()>,SOURCE,"Returns a list of application processes that are running on the device. Note: this method is only intended for debugging or building
+ a user-facing process management UI.",,"List < ActivityManager.RunningAppProcessInfo > Returns a list of RunningAppProcessInfo records or null if there are no
+ running processes (it will not return an empty list).  This list ordering is not
+ specified. |||","An activity is a single focused thing that the user can do.  Almost all
+ activities interact with the user so the Activity class takes care of
+ creating a window for you in which you can place your UI with
+  setContentView(View) .  While activities are often presented to the user
+ as full-screen windows they can also be used in other ways: as floating
+ windows (via a theme with  R.attr.windowIsFloating  set)
+  
+ Multi-Window mode  or embedded into other windows.
+
+ There are two methods almost all subclasses of Activity will implement:
+
+  onCreate(Bundle)  is where you initialize your activity.  Most
+     importantly here you will usually call  setContentView(int) 
+     with a layout resource defining your UI and using  findViewById(int) 
+     to retrieve the widgets in that UI that you need to interact with
+     programmatically.
+
+      onPause()  is where you deal with the user pausing active
+     interaction with the activity. Any changes made by the user should at
+     this point be committed (usually to the
+      ContentProvider  holding the data). In this
+     state the activity is still visible on screen.
+  To be of use with  Context.startActivity()  all
+ activity classes must have a corresponding
+  <activity> 
+ declaration in their package's  AndroidManifest.xml . Topics covered here:
+  Fragments Activity Lifecycle Configuration Changes Starting Activities and Getting Results Saving Persistent State Permissions Process Lifecycle","Contains high-level classes encapsulating the overall Android application model. An Android application is defined using one or more of Android's four core application
+ components. Two such application components are defined in this package:  Activity  and  Service . The other two components are from the  android.content  package:  BroadcastReceiver  and  ContentProvider . An  Activity  is an application component that provides a screen with which
+ users can interact in order to do something such as dial the phone take a photo send an email or
+ view a map. An activity can start other activities including activities that live in separate
+ applications. A  Service  is an application component that can perform
+ long-running operations in the background without a user interface. For example a service
+ can handle network transactions play music or work with a content provider without the user being
+ aware of the work going on. The  Fragment  class is also an important part of an application's
+ design—especially when designing for large screen devices such as tablets. A fragment defines
+ a distinct part of an activity's behavior including the associated UI. It has its own lifecycle
+ that is similar to that of the activity and can exist alongside other fragments that are embedded in
+ the activity. While an activity is running you can add and remove fragments and include each
+ fragment in a back stack that's managed by the activity—allowing the user to navigate
+ backwards through the fragment states without leaving the activity. This package also defines application utilities such as dialogs notifications and the
+ action bar. For information about using some the classes in this package see the following
+ documents:  Activities   Services   Fragments   Using the Action Bar   Creating Dialogs  and  Notifying the User ."

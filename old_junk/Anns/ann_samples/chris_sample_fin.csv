@@ -1,0 +1,409 @@
+,Source/Sink,Origin,Description,Code,Questions/notes,Return,Parameters,ApiLevel
+"<android.opengl.EGL15: int eglClientWaitSync(EGLDisplay,EGLSync,int,long)>",none,chris,,"    public static native int eglClientWaitSync(
+        EGLDisplay dpy,
+        EGLSync sync,
+        int flags,
+        long timeout
+    );",Skip native methods?,int |||,"dpy EGLDisplay |||
+sync EGLSync |||
+flags int |||
+timeout long |||",29
+<android.webkit.WebView: void setWebViewRenderProcessClient(WebViewRenderProcessClient)>,none,chris,"Sets the renderer client object associated with this WebView.
+
+ See setWebViewRenderProcessClient(java.util.concurrent.Executor android.webkit.WebViewRenderProcessClient) for details. WebViewRenderProcessClient callbacks will run on the thread that this WebView was
+ initialized on.","    public void setWebViewRenderProcessClient(
+            @Nullable WebViewRenderProcessClient webViewRenderProcessClient) {
+        checkThread();
+        mProvider.setWebViewRenderProcessClient(null, webViewRenderProcessClient);
+    }",Seems local to app. Class description gives more context about WebViews. Maybe we should include class descriptions in classification features?,void,"webViewRenderProcessClient WebViewRenderProcessClient : the WebViewRenderProcessClient object.
+This value may be null . |||",29
+<android.bluetooth.BluetoothHidDeviceAppQosSettings: int getPeakBandwidth()>,none,chris,,"    public int getPeakBandwidth() {
+        return mPeakBandwidth;
+    }",Seems like we would classifiy this purely on the method name. Is that going to be accurate enough?,int |||,,28
+"<android.bluetooth.BluetoothHidDevice.Callback: void onGetReport(BluetoothDevice,byte,byte,int)>",none,chris,"Callback called when GET_REPORT is received from remote host. Should be replied by
+ application using BluetoothHidDevice#replyReport(BluetoothDevice byte byte
+ byte[]) .","        public void onGetReport(BluetoothDevice device, byte type, byte id, int bufferSize) {
+            Log.d(
+                    TAG,
+                    ""onGetReport: device=""
+                            + device
+                            + "" type=""
+                            + type
+                            + "" id=""
+                            + id
+                            + "" bufferSize=""
+                            + bufferSize);
+        }",What are the limits of callbacks? They seem like they are called by the kernel. Does this mean they can reach anywhere at that point? Does having info in the kernel constitute a leak?,void,"device BluetoothDevice |||
+type byte : Requested Report Type. |||
+id byte : Requested Report Id can be 0 if no Report Id are defined in descriptor. |||
+bufferSize int : Requested buffer size application shall respond with at least given
+number of bytes. |||",28
+<android.media.Session2CommandGroup.Builder: Session2CommandGroup.Builder addCommand(Session2Command)>,none,chris,Adds a command to this command group.,"public Builder addCommand(@NonNull Session2Command command) {
+     if (command == null) {
+          throw new IllegalArgumentException(""command shouldn't be null"");
+     }
+     mCommands.add(command);
+     return this;
+}",I checked class and package descriptions. Seems like theres not enough info to classify this. Do we assume sensitive? Or assume none?,Session2CommandGroup.Builder |||,"command Session2Command : A command to add. Shouldn't be null .
+This value must never be null . |||",29
+<android.app.admin.DevicePolicyManager: boolean isAlwaysOnVpnLockdownEnabled(ComponentName)>,none,chris,"Called by device or profile owner to query whether current always-on VPN is configured in
+ lockdown mode. Returns false when no always-on configuration is set.","    public boolean isAlwaysOnVpnLockdownEnabled(@NonNull ComponentName admin) {
+        throwIfParentInstance(""isAlwaysOnVpnLockdownEnabled"");
+        if (mService != null) {
+            try {
+                // Starting from Android R, the caller can pass the permission check in
+                // DevicePolicyManagerService if it holds android.permission.MAINLINE_NETWORK_STACK.
+                // Note that the android.permission.MAINLINE_NETWORK_STACK is a signature permission
+                // which is used by the NetworkStack mainline module.
+                return mService.isAlwaysOnVpnLockdownEnabled(admin);
+            } catch (RemoteException e) {
+                throw e.rethrowFromSystemServer();
+            }
+        }
+        return false;
+    }",Don't know how to interpret the sensitivity of this.,boolean |||,"admin ComponentName : Which DeviceAdminReceiver this request is associated with.
+This value must never be null . |||",29
+<android.media.MediaFormat: void removeKey(String)>,none,chris,Removes a value of a given key if present. Has no effect if the key is not present.,"    public final void removeKey(@NonNull String name) {
+        // exclude feature mappings
+        if (!name.startsWith(KEY_FEATURE_)) {
+            mMap.remove(name);
+        }
+    }",,void,name String : This value must never be null . |||,29
+<android.icu.text.Edits: void addUnchanged(int)>,none,chris,"Adds a no-change edit: a record for an unchanged segment of text.
+ Normally called from inside ICU string transformation functions not user code.","    public void addUnchanged(int unchangedLength) {
+        if(unchangedLength < 0) {
+            throw new IllegalArgumentException(
+                    ""addUnchanged("" + unchangedLength + ""): length must not be negative"");
+        }
+        // Merge into previous unchanged-text record, if any.
+        int last = lastUnit();
+        if(last < MAX_UNCHANGED) {
+            int remaining = MAX_UNCHANGED - last;
+            if (remaining >= unchangedLength) {
+                setLastUnit(last + unchangedLength);
+                return;
+            }
+            setLastUnit(MAX_UNCHANGED);
+            unchangedLength -= remaining;
+        }
+        // Split large lengths into multiple units.
+        while(unchangedLength >= MAX_UNCHANGED_LENGTH) {
+            append(MAX_UNCHANGED);
+            unchangedLength -= MAX_UNCHANGED_LENGTH;
+        }
+        // Write a small (remaining) length.
+        if(unchangedLength > 0) {
+            append(unchangedLength - 1);
+        }
+    }",,void,unchangedLength int |||,29
+<android.text.style.LineHeightSpan.Standard: int getSpanTypeId()>,source,chris,Return a special type identifier for this span class.,"        @Override
+        public int getSpanTypeId() {
+            return getSpanTypeIdInternal();
+        }
+
+        /** @hide */
+        @Override
+        public int getSpanTypeIdInternal() {
+            return TextUtils.LINE_HEIGHT_SPAN;
+        }","Seems maybe vaguely sensitive, but it depends on what the text is I guess",int |||,,29
+<android.telephony.CellIdentityWcdma: String getMobileNetworkOperator()>,source,chris,,"    public String getMobileNetworkOperator() {
+        return (mMccStr == null || mMncStr == null) ? null : mMccStr + mMncStr;
+    }","Seems sensitive, but little to go on here",String a 5 or 6 character string (MCC+MNC) null if any field is unknown |||,,28
+<android.telephony.SubscriptionPlan: long getDataLimitBytes()>,source,chris,Return the usage threshold at which data access changes according to getDataLimitBehavior() . Value is a non-negative number of bytes.,"    public @BytesLong long getDataLimitBytes() {
+        return dataLimitBytes;
+    }",,long Value is a non-negative number of bytes. |||,,28
+<android.bluetooth.BluetoothHidDevice: List getConnectedDevices()>,source,chris,Get connected devices for this specific profile. Return the set of devices which are in state STATE_CONNECTED Requires Manifest.permission.BLUETOOTH,"    public List<BluetoothDevice> getConnectedDevices() {
+        final IBluetoothHidDevice service = getService();
+        if (service != null) {
+            try {
+                return service.getConnectedDevices();
+            } catch (RemoteException e) {
+                Log.e(TAG, e.toString());
+            }
+        } else {
+            Log.w(TAG, ""Proxy not attached to service"");
+        }
+
+        return new ArrayList<>();
+    }",,List < BluetoothDevice > List of devices. The list will be empty on error. |||,,28
+<android.media.MicrophoneInfo: MicrophoneInfo.Coordinate3F getPosition()>,source,chris,"Returns A Coordinate3F object that represents the geometric location of microphone
+ in meters from bottom-left-back corner of appliance. X-axis Y-axis and Z-axis show
+ as the x y z values.","    public List<BluetoothDevice> getConnectedDevices() {
+        final IBluetoothHidDevice service = getService();
+        if (service != null) {
+            try {
+                return service.getConnectedDevices();
+            } catch (RemoteException e) {
+                Log.e(TAG, e.toString());
+            }
+        } else {
+            Log.w(TAG, ""Proxy not attached to service"");
+        }
+
+        return new ArrayList<>();
+    }",,"MicrophoneInfo.Coordinate3F the geometric location of the microphone or POSITION_UNKNOWN if the
+ geometric location is unknown |||",,28
+<android.telephony.CellIdentityTdscdma: int describeContents()>,source,chris,Implement the Parcelable interface,"    public int describeContents() {
+        return 0;
+    }",There are lots of describeContents() methods. This one seemed sensitive-ish until I looked at the code. Are these never sensitive?,"int a bitmask indicating the set of special object types marshaled
+ by this Parcelable object instance.
+ 
+ Value is either 0 or CONTENTS_FILE_DESCRIPTOR |||",,28
+"<android.app.Activity: void onGetDirectActions(CancellationSignal,Consumer)>",source,chris,"Returns the list of direct actions supported by the app. You should return the list of actions that could be executed in the
+ current context which is in the current state of the app. If the actions
+ that could be executed by the app changes you should report that via
+ calling VoiceInteractor#notifyDirectActionsChanged() . To get the voice interactor you need to call getVoiceInteractor() which would return non null only if there is an ongoing voice
+ interaction session. You an also detect when the voice interactor is no
+ longer valid because the voice interaction session that is backing is finished
+ by calling VoiceInteractor#registerOnDestroyedCallback(Executor Runnable) . This method will be called only after onStart() is being called and
+ before onStop() is being called. You should pass to the callback the currently supported direct actions which
+ cannot be null or contain null elements. You should return the action list as soon as possible to ensure the consumer
+ for example the assistant is as responsive as possible which would improve user
+ experience of your app.","    public void onGetDirectActions(@NonNull CancellationSignal cancellationSignal,
+            @NonNull Consumer<List<DirectAction>> callback) {
+        callback.accept(Collections.emptyList());
+    }",I think I may have misclassified this one. It returns info about the app itself right?,void,"cancellationSignal CancellationSignal : A signal to cancel the operation in progress.
+This value must never be null . |||
+callback Consumer : The callback to send the action list. The actions list cannot
+contain null elements. You can call this on any thread.
+This value must never be null . |||",29
+<android.app.slice.SliceProvider: String getType(Uri)>,source,chris,"Implement this to handle requests for the MIME type of the data at the
+ given URI.  The returned MIME type should start with vnd.android.cursor.item for a single record
+ or vnd.android.cursor.dir/ for multiple items.
+ This method can be called from multiple threads as described in Processes
+ and Threads . Note that there are no permissions needed for an application to
+ access this information; if your content provider requires read and/or
+ write permissions or is not exported all applications can still call
+ this method regardless of their access permissions.  This allows them
+ to retrieve the MIME type for a URI when dispatching intents.","    public final String getType(Uri uri) {
+        if (DEBUG) Log.d(TAG, ""getType "" + uri);
+        return SLICE_TYPE;
+    }",I don't know about this one,String a MIME type string or null if there is no type. |||,"uri Uri : the URI to query.
+This value must never be null . |||",28
+<android.view.accessibility.AccessibilityNodeInfo: void setPaneTitle(CharSequence)>,sink,chris,"If this node represents a visually distinct region of the screen that may update separately
+ from the rest of the window it is considered a pane. Set the pane title to indicate that
+ the node is a pane and to provide a title for it. Note: Cannot be called from an AccessibilityService .
+   This class is made immutable before being delivered to an AccessibilityService.","    public void setPaneTitle(@Nullable CharSequence paneTitle) {
+        enforceNotSealed();
+        mPaneTitle = (paneTitle == null)
+                ? null : paneTitle.subSequence(0, paneTitle.length());
+    }",This provides a way to leave the app and get to the screen. So sensitive?,void,"paneTitle CharSequence : The title of the pane represented by this node.
+This value may be null . |||",28
+<android.view.autofill.AutofillManager: void setUserData(UserData)>,sink,chris,"Sets the UserData used for field classification Note: This method should only be called by an app providing an autofill service
+ and it's ignored if the caller currently doesn't have an enabled autofill service for
+ the user.","    public void setUserData(@Nullable UserData userData) {
+        try {
+            mService.setUserData(userData);
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
+    }",,void,userData UserData : This value may be null . |||,28
+"<android.service.autofill.UserData.Builder: UserData.Builder add(String,String)>",sink,chris,Adds a new value for user data.,"        public Builder add(@NonNull String value, @NonNull String categoryId) {
+            throwIfDestroyed();
+            checkNotEmpty(""categoryId"", categoryId);
+            checkValidValue(value);
+
+            if (!mUniqueCategoryIds.contains(categoryId)) {
+                // New category - check size
+                Preconditions.checkState(mUniqueCategoryIds.size() < getMaxCategoryCount(),
+                        ""already added "" + mUniqueCategoryIds.size() + "" unique category ids"");
+            }
+
+            Preconditions.checkState(mValues.size() < getMaxUserDataSize(),
+                    ""already added "" + mValues.size() + "" elements"");
+            addMapping(value, categoryId);
+
+            return this;
+        }",,UserData.Builder This value will never be null . |||,"value String : value of the user data.
+This value must never be null . |||
+categoryId String : string used to identify the category the value is associated with.
+This value must never be null . |||",28
+"<android.app.admin.DevicePolicyManager: int addOverrideApn(ComponentName,ApnSetting)>",sink,chris,"Called by device owner to add an override APN. This method may returns -1 if apnSetting conflicts with an existing
+ override APN. Update the existing conflicted APN with updateOverrideApn(android.content.ComponentName int android.telephony.data.ApnSetting) instead of adding a new entry. Two override APNs are considered to conflict when all the following APIs return
+ the same values on both override APNs: ApnSetting#getOperatorNumeric() 
+ApnSetting#getApnName() 
+ApnSetting#getProxyAddressAsString() 
+ApnSetting#getProxyPort() 
+ApnSetting#getMmsProxyAddressAsString() 
+ApnSetting#getMmsProxyPort() 
+ApnSetting#getMmsc() 
+ApnSetting#isEnabled() 
+ApnSetting#getMvnoType() 
+ApnSetting#getProtocol() 
+ApnSetting#getRoamingProtocol()","    public int addOverrideApn(@NonNull ComponentName admin, @NonNull ApnSetting apnSetting) {
+        throwIfParentInstance(""addOverrideApn"");
+        if (mService != null) {
+            try {
+                return mService.addOverrideApn(admin, apnSetting);
+            } catch (RemoteException e) {
+                throw e.rethrowFromSystemServer();
+            }
+        }
+        return -1;
+    }","This method basically calls the same method of a different ""service"" class. How do we interpret such wrapper style methods?","int The id of inserted override APN. Or -1 when failed to insert into
+         the database. |||","admin ComponentName : which DeviceAdminReceiver this request is associated with
+This value must never be null . |||
+apnSetting ApnSetting : the override APN to insert
+This value must never be null . |||",28
+"<android.telephony.CellInfoNr: void writeToParcel(Parcel,int)>",sink,chris,Implement the Parcelable interface,"    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags, TYPE_NR);
+        mCellIdentity.writeToParcel(dest, flags);
+        mCellSignalStrength.writeToParcel(dest, flags);
+    }",Parcel hasn't left the app yet. Still sink?,void,"dest Parcel : The Parcel in which the object should be written. |||
+flags int : Additional flags about how the object should be written.
+May be 0 or Parcelable.PARCELABLE_WRITE_RETURN_VALUE .
+Value is either 0 or a combination of Parcelable.PARCELABLE_WRITE_RETURN_VALUE and android.os.Parcelable.PARCELABLE_ELIDE_DUPLICATES |||",29
+"<android.net.wifi.aware.ParcelablePeerHandle: void writeToParcel(Parcel,int)>",sink,chris,Flatten this object in to a Parcel.,"    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(peerId);
+    }",Are writeToParcel() methods sinks if the info going to them is sensitive?,void,"dest Parcel : The Parcel in which the object should be written. |||
+flags int : Additional flags about how the object should be written.
+May be 0 or Parcelable.PARCELABLE_WRITE_RETURN_VALUE .
+Value is either 0 or a combination of Parcelable.PARCELABLE_WRITE_RETURN_VALUE and android.os.Parcelable.PARCELABLE_ELIDE_DUPLICATES |||",29
+"<android.os.Parcel: void writeTypedSparseArray(SparseArray,int)>",sink,chris,"Flatten a SparseArray containing a particular object type into the parcel
+ at the current dataPosition() and growing dataCapacity() if needed. The
+ type of the objects in the array must be one that implements Parcelable.
+ Unlike the generic writeSparseArray(android.util.SparseArray) method however only
+ the raw data of the objects is written and not their type so you must use the
+ corresponding createTypedSparseArray(android.os.Parcelable.Creator) .","    public final <T extends Parcelable> void writeTypedSparseArray(@Nullable SparseArray<T> val,
+            int parcelableFlags) {
+        if (val == null) {
+            writeInt(-1);
+            return;
+        }
+        final int count = val.size();
+        writeInt(count);
+        for (int i = 0; i < count; i++) {
+            writeInt(val.keyAt(i));
+            writeTypedObject(val.valueAt(i), parcelableFlags);
+        }
+    }",Parcel?,void,"val SparseArray : The list of objects to be written.
+This value may be null . |||
+parcelableFlags int : The parcelable flags to use. |||",29
+"<android.net.wifi.aware.WifiAwareNetworkInfo: void writeToParcel(Parcel,int)>",sink,chris,Flatten this object in to a Parcel.,"    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByteArray(mIpv6Addr.getAddress());
+        NetworkInterface ni = mIpv6Addr.getScopedInterface();
+        dest.writeString(ni == null ? null : ni.getName());
+        dest.writeInt(mPort);
+        dest.writeInt(mTransportProtocol);
+    }",Parcel?,void,"dest Parcel : The Parcel in which the object should be written. |||
+flags int : Additional flags about how the object should be written.
+May be 0 or Parcelable.PARCELABLE_WRITE_RETURN_VALUE .
+Value is either 0 or a combination of Parcelable.PARCELABLE_WRITE_RETURN_VALUE and android.os.Parcelable.PARCELABLE_ELIDE_DUPLICATES |||",29
+<android.net.SocketKeepalive.Callback: void onStarted()>,,chris,The requested keepalive was successfully started.,"    public static class Callback {
+        /** The requested keepalive was successfully started. */
+        public void onStarted() {}
+        /** The keepalive was successfully stopped. */
+        public void onStopped() {}
+        /** An error occurred. */
+        public void onError(@ErrorCode int error) {}
+        /** The keepalive on a TCP socket was stopped because the socket received data. This is
+         * never called for UDP sockets. */
+        public void onDataReceived() {}
+    }",Are callbacks usually empty classes like this? Why wouldn't this be an abstract class with methods you can override?,void,,29
+<android.telecom.PhoneAccountSuggestion: int getReason()>,,chris,,"    public @SuggestionReason int getReason() {
+        return mReason;
+    }",This method is pretty vague even with the code. How should we handle this?,"int The reason for this suggestion
+ 
+ Value is REASON_NONE  REASON_INTRA_CARRIER  REASON_FREQUENT  REASON_USER_SET or REASON_OTHER |||",,29
+<android.graphics.BlendModeColorFilter: BlendMode getMode()>,,chris,"Returns the Porter-Duff mode used to composite this color filter's
+ color with the source pixel when this filter is applied.","    public BlendMode getMode() {
+        return mMode;
+    }",,BlendMode |||,,29
+<android.telephony.mbms.DownloadRequest: int hashCode()>,,chris,"Returns a hash code value for the object. This method is
+ supported for the benefit of hash tables such as those provided by HashMap . The general contract of hashCode is: Whenever it is invoked on the same object more than once during
+     an execution of a Java application the hashCode method
+     must consistently return the same integer provided no information
+     used in equals comparisons on the object is modified.
+     This integer need not remain consistent from one execution of an
+     application to another execution of the same application. 
+If two objects are equal according to the equals(Object) method then calling the hashCode method on each of
+     the two objects must produce the same integer result. 
+It is not required that if two objects are unequal
+     according to the equals(java.lang.Object) method then calling the hashCode method on each of the
+     two objects must produce distinct integer results.  However the
+     programmer should be aware that producing distinct integer results
+     for unequal objects may improve the performance of hash tables. 
+As much as is reasonably practical the hashCode method defined by
+ class Object does return distinct integers for distinct
+ objects. (This is typically implemented by converting the internal
+ address of the object into an integer but this implementation
+ technique is not required by the
+ Java™ programming language.)","    public int hashCode() {
+        return Objects.hash(fileServiceId, sourceUri, destinationUri,
+                subscriptionId, serializedResultIntentForApp, version);
+    }",Can hash codes be sensitive? Are they considered encrypted?,int a hash code value for this object. |||,,28
+"<android.telephony.MbmsDownloadSession: void requestDownloadState(DownloadRequest,FileInfo)>",,chris,"Requests information about the state of a file pending download.
+
+ The state will be delivered as a callback via DownloadStatusListener#onStatusUpdated(DownloadRequest FileInfo int) . If no such
+ callback has been registered via addProgressListener(android.telephony.mbms.DownloadRequest java.util.concurrent.Executor android.telephony.mbms.DownloadProgressListener) this
+ method will be a no-op.
+
+ If the middleware has no record of the
+ file indicated by fileInfo being associated with downloadRequest an IllegalArgumentException will be thrown.","    public void requestDownloadState(DownloadRequest downloadRequest, FileInfo fileInfo) {
+        IMbmsDownloadService downloadService = mService.get();
+        if (downloadService == null) {
+            throw new IllegalStateException(""Middleware not yet bound"");
+        }
+
+        try {
+            int result = downloadService.requestDownloadState(downloadRequest, fileInfo);
+            if (result == MbmsErrors.UNKNOWN) {
+                // Unbind and throw an obvious error
+                close();
+                throw new IllegalStateException(""Middleware must not return an unknown error code"");
+            }
+            if (result != MbmsErrors.SUCCESS) {
+                if (result == MbmsErrors.DownloadErrors.ERROR_UNKNOWN_DOWNLOAD_REQUEST) {
+                    throw new IllegalArgumentException(""Unknown download request."");
+                }
+                if (result == MbmsErrors.DownloadErrors.ERROR_UNKNOWN_FILE_INFO) {
+                    throw new IllegalArgumentException(""Unknown file."");
+                }
+                sendErrorToApp(result, null);
+            }
+        } catch (RemoteException e) {
+            mService.set(null);
+            sIsInitialized.set(false);
+            sendErrorToApp(MbmsErrors.ERROR_MIDDLEWARE_LOST, null);
+        }
+    }", ,void,"downloadRequest DownloadRequest : The download request to query. |||
+fileInfo FileInfo : The particular file within the request to get information on. |||",28
+<android.view.textclassifier.TextLinks.TextLink: String toString()>,,chris,"Returns a string representation of the object. In general the toString method returns a string that
+ ""textually represents"" this object. The result should
+ be a concise but informative representation that is easy for a
+ person to read.
+ It is recommended that all subclasses override this method. The toString method for class Object returns a string consisting of the name of the class of which the
+ object is an instance the at-sign character ` @ ' and
+ the unsigned hexadecimal representation of the hash code of the
+ object. In other words this method returns a string equal to the
+ value of:","        @Override
+        public String toString() {
+            return String.format(Locale.US,
+                    ""TextLink{start=%s, end=%s, entityScores=%s, urlSpan=%s}"",
+                    mStart, mEnd, mEntityScores, mUrlSpan);
+        }",,String a string representation of the object. |||,,28
+<android.view.DisplayCutout: String toString()>,,chris,"Returns a string representation of the object. In general the toString method returns a string that
+ ""textually represents"" this object. The result should
+ be a concise but informative representation that is easy for a
+ person to read.
+ It is recommended that all subclasses override this method. The toString method for class Object returns a string consisting of the name of the class of which the
+ object is an instance the at-sign character ` @ ' and
+ the unsigned hexadecimal representation of the hash code of the
+ object. In other words this method returns a string equal to the
+ value of:","    public String toString() {
+        return ""DisplayCutout{insets="" + mSafeInsets
+                + "" boundingRect={"" + mBounds + ""}""
+                + ""}"";
+    }",,String a string representation of the object. |||,,28
+<android.app.Notification.BubbleMetadata.Builder: Notification.BubbleMetadata build()>,,chris,Creates the BubbleMetadata defined by this builder.,"            public BubbleMetadata build() {
+                if (mPendingIntent == null) {
+                    throw new IllegalStateException(""Must supply pending intent to bubble"");
+                }
+                if (mIcon == null) {
+                    throw new IllegalStateException(""Must supply an icon for the bubble"");
+                }
+                BubbleMetadata data = new BubbleMetadata(mPendingIntent, mDeleteIntent,
+                        mIcon, mDesiredHeight, mDesiredHeightResId);
+                data.setFlags(mFlags);
+                return data;
+            }",,Notification.BubbleMetadata This value will never be null . |||,,29

@@ -1,0 +1,208 @@
+,Y,Description,Parameters,Return,ApiLevel
+<android.media.audiofx.DynamicsProcessing.Config: void setPreEqAllChannelsTo(DynamicsProcessing.Eq)>,,"Sets the PreEq stage configuration for ALL channels. Note that new preEq stage must have
+ the same number of bands than original preEq stages.",preEq DynamicsProcessing.Eq : desired PreEq configuration to be set |||,,28.0
+"<android.app.Instrumentation: Activity startActivitySync(Intent,Bundle)>",,"Start a new activity and wait for it to begin running before returning.
+ In addition to being synchronous this method as some semantic
+ differences from the standard Context#startActivity call: the
+ activity component is resolved before talking with the activity manager
+ (its class name is specified in the Intent that this method ultimately
+ starts) and it does not allow you to start activities that run in a
+ different process.  In addition if the given Intent resolves to
+ multiple activities instead of displaying a dialog for the user to
+ select an activity an exception will be thrown. The function returns as soon as the activity goes idle following the
+ call to its Activity#onCreate .  Generally this means it has gone
+ through the full initialization including Activity#onResume and
+ drawn and displayed its initial window.","intent Intent : Description of the activity to start.
+This value must never be null . |||
+options Bundle : Additional options for how the Activity should be started.
+May be null if there are no options.  See ActivityOptions for how to build the Bundle supplied here; there are no supported definitions
+for building it manually.
+This value may be null . |||",Activity |||,28.0
+<android.app.assist.AssistStructure.ViewNode: String getWebScheme()>,,"Returns the scheme of the HTML document represented by this view. Typically used when the view associated with the view is a container for an HTML
+ document.",,"String scheme-only part of the document. For example if the full URL is https://example.com/login?user=my_user it returns https .
+ 
+ This value may be null . |||",28.0
+<android.telephony.CellIdentityGsm: String getMncString()>,,,,String Mobile Network Code in string format null if unavailable. |||,28.0
+<android.app.slice.SliceMetrics: void logVisible()>,,To be called whenever the slice becomes visible to the user.,,,28.0
+<android.media.audiofx.DynamicsProcessing.Config: boolean isPreEqInUse()>,,Gets if preEq stage is in use,,boolean true if preEq stage is in use; |||,28.0
+<android.icu.text.CaseMap: CaseMap.Lower toLower()>,,,,CaseMap.Lower Lowercasing object with default options. |||,29.0
+<android.security.ConfirmationCallback: void onError(Throwable)>,,Called when the requested prompt was dismissed because of a low-level error.,e Throwable : a throwable representing the error. |||,,28.0
+"<android.app.admin.DeviceAdminReceiver: void onTransferOwnershipComplete(Context,PersistableBundle)>",,"Called on the newly assigned owner (either device owner or profile owner) when the ownership
+ transfer has completed successfully. The bundle parameter allows the original owner to pass data
+ to the new one.","context Context : the running context as per onReceive(Context Intent) This value must never be null . |||
+bundle PersistableBundle : the data to be passed to the new owner
+This value may be null . |||",,28.0
+<android.telephony.euicc.EuiccManager: EuiccManager createForCardId(int)>,,Create a new EuiccManager object pinned to the given card ID.,cardId int |||,"EuiccManager an EuiccManager that uses the given card ID for all calls.
+ 
+ This value will never be null . |||",29.0
+<android.service.notification.ZenPolicy: int getPriorityCategoryReminders()>,,"Whether this policy wants to allow notifications with category Notification#CATEGORY_REMINDER to play sounds and visually appear
+ or to intercept them when DND is active.",,int STATE_UNSET  STATE_ALLOW or STATE_DISALLOW Value is STATE_UNSET  STATE_ALLOW or STATE_DISALLOW |||,29.0
+<android.media.AudioPresentation.Builder: AudioPresentation.Builder setHasSpokenSubtitles(boolean)>,,Indicate whether the presentation contains spoken subtitles for the visually impaired.,spokenSubtitlesAvailable boolean : Spoken subtitles for the visually impaired. |||,AudioPresentation.Builder This value will never be null . |||,29.0
+<android.media.RingtoneManager: boolean hasHapticChannels(Uri)>,,"Returns if the Ringtone from a given sound URI contains
+ haptic channels or not.","ringtoneUri Uri : The Uri of a sound or ringtone.
+This value must never be null . |||",boolean true if the ringtone contains haptic channels. |||,29.0
+<android.graphics.RecordingCanvas: int getHeight()>,,Returns the height of the current drawing layer,,int the height of the current drawing layer |||,29.0
+<android.view.textclassifier.ConversationActions: String getId()>,,Returns the id if one exists for this object.,,String This value may be null . |||,29.0
+<android.telephony.CellSignalStrengthGsm: int getBitErrorRate()>,,Return the Bit Error Rate.,,int the bit error rate (0-7 99) as defined in TS 27.007 8.5 or UNAVAILABLE . |||,29.0
+<android.telecom.TelecomManager: String getSystemDialerPackage()>,,Determines the package name of the system-provided default phone app.,,"String package name for the system dialer package or null if no system dialer is
+         preloaded. |||",29.0
+<android.telephony.SubscriptionInfo: String getMncString()>,,,,"String The MNC as a string.
+ 
+ This value may be null . |||",29.0
+<android.app.admin.DevicePolicyManager: int getGlobalPrivateDnsMode(ComponentName)>,,Returns the system-wide Private DNS mode.,"admin ComponentName : which DeviceAdminReceiver this request is associated with.
+This value must never be null . |||",int one of PRIVATE_DNS_MODE_OFF  PRIVATE_DNS_MODE_OPPORTUNISTIC  PRIVATE_DNS_MODE_PROVIDER_HOSTNAME or PRIVATE_DNS_MODE_UNKNOWN . |||,29.0
+<android.net.wifi.p2p.WifiP2pConfig.Builder: WifiP2pConfig.Builder setNetworkName(String)>,,"Specify the network name a.k.a. group name
+ for creating or joining a group. A network name shall begin with ""DIRECT-xy"". x and y are selected
+ from the following character set: upper case letters lower case
+ letters and numbers. Any byte values allowed for an SSID according to
+ IEEE802.11-2012 [1] may be included after the string ""DIRECT-xy""
+ (including none). Must be called - an empty network name or an network name
+     not conforming to the P2P Group ID naming rule is not valid.","networkName String : network name of a group.
+This value must never be null . |||","WifiP2pConfig.Builder The builder to facilitate chaining builder.setXXX(..).setXXX(..) .
+ 
+ This value will never be null . |||",29.0
+"<android.database.AbstractCursor: void setNotificationUris(ContentResolver,List)>",,"Similar to setNotificationUri(android.content.ContentResolver android.net.Uri) except this version allows
+ to watch multiple content URIs for changes. If this is not implemented this is equivalent to calling setNotificationUri(android.content.ContentResolver android.net.Uri) with the first URI in uris . Calling this overrides any previous call to setNotificationUri(android.content.ContentResolver android.net.Uri) .","cr ContentResolver : This value must never be null . |||
+notifyUris List : This value must never be null . |||",,29.0
+<android.content.pm.ShortcutInfo.Builder: ShortcutInfo.Builder setLocusId(LocusId)>,,"Sets the LocusId associated with this shortcut. This method should be called when the LocusId is used in other places (such
+ as Notification and ContentCaptureContext ) so the device's intelligence
+ services can correlate them.",locusId LocusId : This value must never be null . |||,ShortcutInfo.Builder This value will never be null . |||,29.0
+<android.media.audiofx.DynamicsProcessing.Config.Builder: DynamicsProcessing.Config.Builder setInputGainAllChannelsTo(float)>,,,inputGain float |||,DynamicsProcessing.Config.Builder |||,28.0
+<android.graphics.drawable.LayerDrawable: void setTintBlendMode(BlendMode)>,,"Specifies a tint blending mode for this drawable. Defines how this drawable's tint color should be blended into the drawable
+ before it is drawn to screen. Default tint mode is BlendMode#SRC_IN . Note: Setting a color filter via setColorFilter(android.graphics.ColorFilter)",blendMode BlendMode : This value must never be null . |||,,29.0
+<android.media.AudioPresentation.Builder: AudioPresentation.Builder setHasDialogueEnhancement(boolean)>,,Indicate whether the presentation supports dialogue enhancement.,dialogueEnhancementAvailable boolean : Dialogue enhancement. |||,AudioPresentation.Builder This value will never be null . |||,29.0
+"<android.hardware.biometrics.BiometricPrompt: void authenticate(BiometricPrompt.CryptoObject,CancellationSignal,Executor,BiometricPrompt.AuthenticationCallback)>",,"This call warms up the biometric hardware displays a system-provided dialog and starts
+ scanning for a biometric. It terminates when AuthenticationCallback#onAuthenticationError(int CharSequence) is called when AuthenticationCallback#onAuthenticationSucceeded( AuthenticationResult) or when the user
+ dismisses the system-provided dialog at which point the crypto object becomes invalid. This
+ operation can be canceled by using the provided cancel object. The application will receive
+ authentication errors through AuthenticationCallback and button events through the
+ corresponding callback set in Builder#setNegativeButton(CharSequence Executor
+ DialogInterface.OnClickListener) . It is safe to reuse the BiometricPrompt object
+ and calling BiometricPrompt#authenticate(CancellationSignal Executor
+ AuthenticationCallback) while an existing authentication attempt is occurring will stop the
+ previous client and start a new authentication. The interrupted client will receive a
+ cancelled notification through AuthenticationCallback#onAuthenticationError(int
+ CharSequence) . Note: Applications generally should not cancel and start authentication in quick
+ succession. For example to properly handle authentication across configuration changes it's
+ recommended to use BiometricPrompt in a fragment with setRetainInstance(true). By doing so
+ the application will not need to cancel/restart authentication during the configuration
+ change. Per the Android CDD only biometric authenticators that meet or exceed the requirements
+ for Strong are permitted to integrate with Keystore to perform related
+ cryptographic operations. Therefore it is an error to call this method after explicitly
+ calling Builder#setAllowedAuthenticators(int) with any biometric strength other than Authenticators#BIOMETRIC_STRONG . Requires Manifest.permission.USE_BIOMETRIC","crypto BiometricPrompt.CryptoObject : A cryptographic operation to be unlocked after successful authentication.
+This value must never be null . |||
+cancel CancellationSignal : An object that can be used to cancel authentication.
+This value must never be null . |||
+executor Executor : An executor to handle callback events.
+This value must never be null .
+Callback and listener events are dispatched through this Executor providing an easy way to control which thread is
+used. To dispatch events through the main thread of your
+application you can use Context.getMainExecutor() .
+To dispatch events through a shared thread pool you can use AsyncTask#THREAD_POOL_EXECUTOR . |||
+callback BiometricPrompt.AuthenticationCallback : An object to receive authentication events.
+This value must never be null . |||",,28.0
+"<android.provider.DocumentsProvider: Cursor querySearchDocuments(String,String,Bundle)>",,"Return documents that match the given query under the requested
+ root. The returned documents should be sorted by relevance in descending
+ order. How documents are matched against the query string is an
+ implementation detail left to each provider but it's suggested that at
+ least Document#COLUMN_DISPLAY_NAME be matched in a
+ case-insensitive fashion. If your provider is cloud-based and you have some data cached or pinned
+ locally you may return the local data immediately setting DocumentsContract#EXTRA_LOADING on the Cursor to indicate that
+ you are still fetching additional data. Then when the network data is
+ available you can send a change notification to trigger a requery and
+ return the complete contents. To support change notifications you must Cursor#setNotificationUri(ContentResolver Uri) with a relevant
+ Uri such as DocumentsContract#buildSearchDocumentsUri(String
+ String String) . Then you can call ContentResolver#notifyChange(Uri
+ android.database.ContentObserver boolean) with that Uri to send change
+ notifications.","rootId String : the root to search under.
+This value must never be null . |||
+projection String : list of Document columns to put into the
+cursor. If null all supported columns should be
+included.
+This value may be null . |||
+queryArgs Bundle : the query arguments. DocumentsContract#QUERY_ARG_EXCLUDE_MEDIA  DocumentsContract#QUERY_ARG_DISPLAY_NAME  DocumentsContract#QUERY_ARG_MIME_TYPES  DocumentsContract#QUERY_ARG_FILE_SIZE_OVER  DocumentsContract#QUERY_ARG_LAST_MODIFIED_AFTER .
+This value must never be null . |||","Cursor cursor containing search result. Include ContentResolver#EXTRA_HONORED_ARGS in Cursor extras Bundle when any QUERY_ARG_* value was honored
+         during the preparation of the results. |||",29.0
+"<android.icu.text.Bidi: Bidi createLineBidi(int,int)>",,"Create a Bidi object representing the bidi information on a line of text
+ within the paragraph represented by the current Bidi. This call is not
+ required if the entire paragraph fits on one line.","lineStart int : the offset from the start of the paragraph to the start
+of the line. |||
+lineLimit int : the offset from the start of the paragraph to the limit
+of the line. |||",Bidi |||,29.0
+"<android.view.textclassifier.ConversationAction: void writeToParcel(Parcel,int)>",,Flatten this object in to a Parcel.,"parcel Parcel : The Parcel in which the object should be written. |||
+flags int : Additional flags about how the object should be written.
+May be 0 or Parcelable.PARCELABLE_WRITE_RETURN_VALUE .
+Value is either 0 or a combination of Parcelable.PARCELABLE_WRITE_RETURN_VALUE and android.os.Parcelable.PARCELABLE_ELIDE_DUPLICATES |||",,29.0
+<android.telecom.Conference: void setConnectionStartElapsedRealTime(long)>,,"This method was deprecated
+      in API level R. use setConnectionStartElapsedRealtimeMillis(long) instead. Sets the start time of the Conference which is the basis for the determining the
+ duration of the Conference . You should use a value returned by SystemClock#elapsedRealtime() to ensure that time
+ zone changes do not impact the conference duration. When setting this you should also set the connection time via setConnectionTime(long) .",connectionStartElapsedRealTime long : The connection time as measured by SystemClock#elapsedRealtime() . |||,,28.0
+<android.graphics.drawable.ColorStateListDrawable: void setTintBlendMode(BlendMode)>,,"Specifies a tint blending mode for this drawable. Defines how this drawable's tint color should be blended into the drawable
+ before it is drawn to screen. Default tint mode is BlendMode#SRC_IN . Note: Setting a color filter via setColorFilter(android.graphics.ColorFilter)",blendMode BlendMode : This value must never be null . |||,,29.0
+<android.view.View: void setAnimationMatrix(Matrix)>,,"Changes the transformation matrix on the view. This is used in animation frameworks
+ such as Transition . When the animation finishes the matrix
+ should be cleared by calling this method with null as the matrix parameter.
+ Application developers should use transformation methods like setRotation(float)  setScaleX(float)  setScaleX(float)  setTranslationX(float) }
+ and setTranslationY(float) (float)}} instead.","matrix Matrix : The matrix null indicates that the matrix should be cleared.
+This value may be null . |||",,29.0
+<android.service.autofill.FillEventHistory.Event: Map getManuallyEnteredField()>,,"Returns which fields were available on datasets provided by the service but manually
+ entered by the user. For example server provides: User doesn't select a dataset but manually enters: Then the result is the following map: Note: Only set on events of type TYPE_CONTEXT_COMMITTED .",,"Map < AutofillId  Set < String >> map map whose key is the id of the manually-entered field and value is the
+ ids of the datasets that have that value but were not selected by the user.
+ 
+ This value will never be null . |||",28.0
+"<android.bluetooth.BluetoothHidDevice.Callback: void onInterruptData(BluetoothDevice,byte,byte)>",,"Callback called when report data is received over interrupt channel. Report Type is
+ assumed to be BluetoothHidDevice#REPORT_TYPE_OUTPUT .","device BluetoothDevice |||
+reportId byte : Report Id. |||
+data byte : Report data. |||",,28.0
+<android.view.textclassifier.TextClassifierEvent.Builder: T setExtras(Bundle)>,,"Sets a bundle containing non-structured extra information about the event. NOTE: Prefer to set only immutable values on the bundle otherwise avoid
+ updating the internals of this bundle as it may have unexpected consequences on the
+ clients of the built event object. For similar reasons avoid depending on mutable
+ objects in this bundle.",extras Bundle : This value must never be null . |||,T This value will never be null . |||,29.0
+<android.app.usage.EventStats: int describeContents()>,,"Describe the kinds of special objects contained in this Parcelable
+ instance's marshaled representation. For example if the object will
+ include a file descriptor in the output of writeToParcel(android.os.Parcel int) the return value of this method must include the CONTENTS_FILE_DESCRIPTOR bit.",,"int a bitmask indicating the set of special object types marshaled
+ by this Parcelable object instance.
+ 
+ Value is either 0 or CONTENTS_FILE_DESCRIPTOR |||",28.0
+<android.net.InetAddresses: InetAddress parseNumericAddress(String)>,,"Returns an InetAddress corresponding to the given numeric address (such
+ as ""192.168.0.1"" or ""2001:4860:800d::68"" ). See isNumericAddress(java.lang.String) (String)} for a definition as to what constitutes a
+ numeric address. This method will never do a DNS lookup.","address String : the address to parse must be numeric.
+This value must never be null . |||","InetAddress an InetAddress instance corresponding to the address.
+ This value will never be null . |||",29.0
+"<android.app.admin.DevicePolicyManager: boolean setKeyPairCertificate(ComponentName,String,List,boolean)>",,"Called by a device or profile owner or delegated certificate installer to associate
+ certificates with a key pair that was generated using generateKeyPair(ComponentName String KeyGenParameterSpec int) and
+ set whether the key is available for the user to choose in the certificate selection
+ prompt.","admin ComponentName : Which DeviceAdminReceiver this request is associated with or null if calling from a delegated certificate installer.
+This value may be null . |||
+alias String : The private key alias under which to install the certificate. The alias should denote an existing private key. If a certificate with that alias already
+exists it will be overwritten.
+This value must never be null . |||
+certs List : The certificate chain to install. The chain should start with the leaf
+certificate and include the chain of trust in order. This will be returned by KeyChain.getCertificateChain(Context String) .
+This value must never be null . |||
+isUserSelectable boolean : true to indicate that a user can select this key via the
+certificate selection prompt false to indicate that this key can only be
+granted access by implementing DeviceAdminReceiver.onChoosePrivateKeyAlias(Context Intent int Uri String) . |||","boolean true if the provided alias exists and the certificates has been
+        successfully associated with it false otherwise. |||",28.0
+<android.view.contentcapture.DataRemovalRequest.LocusIdRequest: LocusId getLocusId()>,,Gets the LocusId per se.,,LocusId This value will never be null . |||,29.0
+"<android.widget.Magnifier.Builder: Magnifier.Builder setDefaultSourceToMagnifierOffset(int,int)>",,"Sets an offset that should be added to the content source center to obtain
+ the position of the magnifier window when the Magnifier.show(float float) method is called. The offset is ignored when Magnifier.show(float float float float) is used. The offset can be negative. It defaults to (0dp 0dp).","horizontalOffset int : the horizontal component of the offset
+This units of this value are pixels. |||
+verticalOffset int : the vertical component of the offset
+This units of this value are pixels. |||",Magnifier.Builder This value will never be null . |||,29.0
+<android.view.textclassifier.ConversationAction: CharSequence getTextReply()>,,Returns the text reply that could be sent as a reply to the given conversation. This is only available when the type of the action is TYPE_TEXT_REPLY .,,CharSequence This value may be null . |||,29.0
+<android.os.PowerManager: int getCurrentThermalStatus()>,,This function returns the current thermal status of the device.,,"int thermal status as int THERMAL_STATUS_NONE if device in not under
+ thermal throttling.
+ 
+ Value is THERMAL_STATUS_NONE  THERMAL_STATUS_LIGHT  THERMAL_STATUS_MODERATE  THERMAL_STATUS_SEVERE  THERMAL_STATUS_CRITICAL  THERMAL_STATUS_EMERGENCY or THERMAL_STATUS_SHUTDOWN |||",29.0
+<android.webkit.TracingConfig.Builder: TracingConfig.Builder setTracingMode(int)>,,"Sets the tracing mode for this configuration.
+ When tracingMode is not set explicitly the default is TracingConfig.RECORD_CONTINUOUSLY .","tracingMode int : The tracing mode to use one of TracingConfig.RECORD_UNTIL_FULL or TracingConfig.RECORD_CONTINUOUSLY .
+Value is TracingConfig.RECORD_UNTIL_FULL or TracingConfig.RECORD_CONTINUOUSLY |||",TracingConfig.Builder The builder to facilitate chaining. |||,28.0
+<android.telephony.AvailableNetworkInfo: List getMccMncs()>,,"Return List of PLMN ids (MCC-MNC) associated with the sub ID.
+ Opportunistic Network Service will scan and verify specified PLMNs are available.
+ If this entry is left empty then the Opportunistic Network Service will not scan the network
+ to validate the network availability.",,"List < String > list of PLMN ids
+ 
+ This value will never be null . |||",29.0
+<android.app.Person.Builder: Person.Builder setIcon(Icon)>,,Add an icon for this person. The system will prefer this icon over any images that are resolved from the URI.,"icon Icon : the icon of the person.
+This value may be null . |||",Person.Builder This value will never be null . |||,28.0
