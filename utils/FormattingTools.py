@@ -7,13 +7,12 @@ import json
 class Preprocessor():
 
     def __init__(self, anns_fname=None, man_feats_fname=None, docs_fname=None, doc_columns=None
-                 , remove_no_man_feats=False, use_man_feat_anns=False, up_to_api_level=None
+                 , use_man_feat_anns=False, up_to_api_level=None
                  , use_sig_feats=True, ret_only_annotated=True):
         self.anns_fname = anns_fname
         self.man_feats_fname = man_feats_fname
         self.docs_fname = docs_fname
         self.doc_columns = doc_columns
-        self.remove_no_man_feats = remove_no_man_feats
         self.use_man_feats_anns = use_man_feat_anns
         self.up_to_api_level=up_to_api_level
         self.use_sig_feats = use_sig_feats
@@ -106,16 +105,10 @@ class Preprocessor():
 
 
     def replace_missing_with_mode(self, s:pd.Series, missing_label='NOT_SUPPORTED'):
-        # tot = s.shape[0]
-        # pos = (s==true_label).sum()
         counts = s.value_counts().sort_values(ascending=False)
-        # print(counts)
-
         mode = counts.index[0]
         if mode == missing_label:
             mode = counts.index[1]
-        # print('Missing vals in col:', s.name, 'is', s[s==missing_label].shape[0])
-        # print('\tmode:',mode)
         s = s.replace(missing_label, mode)
         return s
 
@@ -148,13 +141,11 @@ class Preprocessor():
 
         dataframes = []
         for i, filename in enumerate(os.listdir(dirname)):
-            print("Loading " + filename + ".....")
-            if not os.path.isdir(dirname + '/' + filename):
+            if not os.path.isdir(dirname + '/' + filename) and re.search(r"\.json$", filename) is not None:
+                print("Loading " + filename + ".....")
                 with open(dirname + '/' + filename) as f:
                     data = json.load(f)
                     df = pd.DataFrame.from_dict(data, orient="index")
-                    # df = self.convert_str_to_float(df)
-                    print('df shape:', df.shape)
                 dataframes.append(df)
         return pd.concat(dataframes)
 
@@ -173,24 +164,11 @@ class Preprocessor():
 
 
     def preprocess_ann_file(self):
-
         # use_cols = ['Unnamed: 0', 'Source?', 'Sink?', 'sensitive data?', 'shared resource?']
+
+        print(self.anns_fname)
         df = pd.read_csv(self.anns_fname, index_col=0)#, usecols=use_cols)
         df = self.formatAnns(df)
-        # df = df.rename(
-        #     columns={'sensitive data?': 'Information Type', 'shared resource?': 'Shared Resource Type'})
-        # df.loc[df['Information Type'] == 'no', 'Information Type'] = 'None'
-        # df.loc[df['Shared Resource Type'] == 'no', 'Shared Resource Type'] = 'None'
-        # df['Source/Sink'] = 'NEITHER'
-        # df.loc[(df['Source?'] != 'no') & (~df['Source?'].isna()), 'Source/Sink'] = 'SOURCE'
-        # df.loc[(df['Sink?'] != 'no') & (~df['Sink?'].isna()), 'Source/Sink'] = 'SINK'
-        # df = df.drop(['Source?', 'Sink?'], axis=1)
-
-        # df = df.loc[~df.index.duplicated(keep='first')]
-
-        # print(df.columns)
-        # print(df['Annotation'].value_counts())
-        # sys.exit()
         return df
 
 
@@ -200,30 +178,18 @@ class Preprocessor():
         docs = self.formatDocs(docs)
         docs = docs.loc[~docs.index.duplicated(keep='first')]
 
-
-
         if orig_df is not None:
             orig_index = orig_df.index
             orig_df.index = self.stanardize_index(orig_df)
             docs = docs.loc[docs.index.isin(orig_df.index)]
             not_in_docs:pd.DataFrame = orig_df.loc[~orig_df.index.isin(docs.index)].copy()
-            # pd.set_option("display.max_colwidth", 1000)
-            # print("not in docs:", not_in_docs)
             if not not_in_docs.empty:
                 for col in docs.columns:
                     not_in_docs.loc[:,col] = ''
                 not_in_docs = not_in_docs.drop(orig_df.columns, axis=1)
                 docs = docs.append(not_in_docs)
             docs = docs.loc[orig_df.index]
-            # print("orig df shape before merge:", orig_df.shape)
-            # print("# methods from docs in orig df:", docs.shape[0])
-            # print("check getDeviceId before merge:")
-            # print(docs.loc[docs["MethodName"] == "getDeviceId", 'MethodName'])
-
             orig_df = pd.concat((orig_df,docs), axis=1)
-            # print("check getDeviceId after merge:")
-            # print(orig_df.loc[orig_df["MethodName"] == "getDeviceId", 'MethodName'])
-            # print("orig df shape after merge:", orig_df.shape)
             orig_df.index = orig_index
         else:
             orig_df = docs
@@ -248,28 +214,18 @@ class Preprocessor():
         if os.path.isdir(self.man_feats_fname):
             man_feats:pd.DataFrame = self.extract_df_from_dir(self.man_feats_fname)
         else:
-            print(self.man_feats_fname, "is not a directory.")
-            print("Detecting file type....")
+            print("\n\t"+self.man_feats_fname+" is not a directory.")
+            print("\tDetecting file type....")
             mo = re.search(r".*\.pickle", self.man_feats_fname)
             if mo is not None:
-                print("Found pickled file, attempting to unpickle...")
+                print("\tFound pickled file, attempting to unpickle...", end=" ")
                 man_feats:pd.DataFrame = pd.read_pickle(self.man_feats_fname)
 
             else:
                 man_feats:pd.DataFrame = json.load(self.man_feats_fname)
 
-
-
-        # for col in man_feats.columns:
-        #     if col == 'AnnotationMF':
-        #         continue
-        #
-        #     man_feats[col] = self.replace_missing_with_mode(man_feats[col])
-
         if self.use_man_feats_anns:
             man_feats_ann = man_feats['AnnotationMF']
-            print(man_feats_ann)
-            print(man_feats_ann.value_counts())
             man_feats = man_feats.drop("AnnotationMF", axis=1)
             orig_df = man_feats
             orig_df['Annotation'] = man_feats_ann.values
@@ -294,20 +250,18 @@ class Preprocessor():
         if orig_df is not None:
             orig_df = orig_df.loc[~orig_df.index.duplicated(keep='first')]
             man_feats = self.formatManFeats(man_feats)
-            print("man feats methods:", man_feats.shape[0])
             mask = man_feats.index.isin(orig_df.index)
             man_feats = man_feats.loc[mask]
             mask2 = orig_df.index.isin(man_feats.index)
-            orig_df = orig_df.loc[mask2]
-
+            orig_df2 = orig_df.loc[mask2]
 
             if man_feats.shape[0] != orig_df.shape[0]:
-                print("Error in aligning manual features to annotations. Shape mismatch in number of methods\n"+
+                print("\nError in aligning manual features to annotations. Shape mismatch in number of methods\n"+
                       "\tNumber of unique annotations:",orig_df.shape[0],"\n\tnumber of unique methods from manual "+
                       "feature extraction:", man_feats.shape[0])
 
+                pd.set_option("display.max_colwidth", 1000)
                 print(orig_df.loc[~orig_df.index.isin(man_feats.index)])
-                # print(man_feats)
                 sys.exit()
 
             orig_df = orig_df.loc[man_feats.index]
@@ -325,26 +279,27 @@ class Preprocessor():
         ret_df = None
         # Annotations
         if self.anns_fname is not None:
+            print("Processing annotations file...", end=" ")
             ret_df = self.preprocess_ann_file()
-            print('After ann file:', ret_df.shape)
+            print('Done. Current data dimensions:', ret_df.shape)
 
         # Manual features file
         if self.man_feats_fname is not None:
+            print("Processing manual features file...", end=" ")
             ret_df = self.preprocess_man_feats_file(ret_df)
-            print('After manual features file:', ret_df.shape)
+            print('Done. Current data dimensions:', ret_df.shape)
 
         # Documentation file
         if self.docs_fname is not None:
+            print("Processing documantation file...", end=" ")
             ret_df = self.preprocess_doc_file(ret_df)
-            print('After doc file:', ret_df.shape)
-
-        # print("check getDeviceId:")
-        # print(ret_df.loc[ret_df["MethodName"] == "getDeviceId", 'MethodName'])
+            print('Done. Current data dimensions:', ret_df.shape)
 
         # Add features from method signature
         if self.use_sig_feats:
+            print("Extracting signature information...", end=" ")
             self.add_toks_in_signature(ret_df, method_name=True, class_name=True, qual_path=True)
-            print('After Signature features:', ret_df.shape)
+            print('Done. Current data dimensions:', ret_df.shape)
 
         ret_df = self.custom_fill_na(ret_df)
         ret_df = ret_df.loc[~ret_df.index.duplicated(keep='first')]
