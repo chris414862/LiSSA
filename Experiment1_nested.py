@@ -17,7 +17,7 @@ This experiments compares features on the OLD set of method annotations (api lev
 '''
 
 #Experimental parameters
-EXPERIMENT_NAME="ManualFeatsOnly" #Used to control which feature set to use AND which directory to save to
+EXPERIMENT_NAME="NLFeatsOnly" #Used to control which feature set to use AND which directory to save to
 feature_sets = {
                 "AllFeats"        : ["Manual_Feats", "Return", "Parameters", "SigFeatures", "Description"],
                 "NLFeatsOnly"     : ["Return", "Parameters", "SigFeatures", "Description"],

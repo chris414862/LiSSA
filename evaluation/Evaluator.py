@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from SSModel.ModelInterface import Model
 import sys
+import os
 from scipy.sparse.csr import csr_matrix
 from utils.Configuration import ConfigSVMSearch, ConfigNLFeatures, ConfigNLFeaturesSearch, ConfigSVM
 import random
@@ -147,14 +148,17 @@ class Evaluation():
         return best_config, stats_of_best
 
     class inner_prog_bar():
-        def __init__(self, tot_folds, sub_steps, bar_width=20):
+        def __init__(self, tot_folds, sub_steps, bar_width=200):
             self.tot_folds = tot_folds
             self.num_sub_steps = sub_steps
             self.tot_steps = self.tot_folds*self.num_sub_steps
             self.label_string ="Inner fold number: {curr_fold_num} "
             self.max_label_string_len = len(self.label_string.format(curr_fold_num=self.tot_folds))
             self.curr_step = 0
-            self.bar_width = bar_width
+
+            #-5 explanation: -2 from progbar border, -1 from arrow, -2 for terminal boarder padding
+            self.bar_width = bar_width if bar_width < os.get_terminal_size().columns - self.max_label_string_len -5\
+                    else os.get_terminal_size().columns - self.max_label_string_len -5
 
         def display(self):
             fold_num = self.curr_step//self.num_sub_steps+1
