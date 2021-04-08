@@ -5,10 +5,13 @@ import numpy as np
 from SSModel.ModelInterface import Model
 import sys
 import os
+import shutil
 from scipy.sparse.csr import csr_matrix
 from utils.Configuration import ConfigSVMSearch, ConfigNLFeatures, ConfigNLFeaturesSearch, ConfigSVM
 import random
 import time
+import subprocess
+from utils.terminalsize import get_terminal_size
 '''
 This class is responsible for performing the evaluation of a cLiSSAfier model. The internals of the classification 
 model, tokenization scheme, and the vector representations are abstracted and lie in the implementation of the 
@@ -152,25 +155,32 @@ class Evaluation():
             self.tot_folds = tot_folds
             self.num_sub_steps = sub_steps
             self.tot_steps = self.tot_folds*self.num_sub_steps
-            self.label_string ="Inner fold number: {curr_fold_num} "
+            self.label_string ="Inner fold number: {curr_fold_num}  "
             self.max_label_string_len = len(self.label_string.format(curr_fold_num=self.tot_folds))
             self.curr_step = 0
 
-            #-5 explanation: -2 from progbar border, -1 from arrow, -2 for terminal boarder padding
-            self.bar_width = bar_width if bar_width < os.get_terminal_size().columns - self.max_label_string_len -5\
-                    else os.get_terminal_size().columns - self.max_label_string_len -5
+            self.bar_width = bar_width
 
         def display(self):
             fold_num = self.curr_step//self.num_sub_steps+1
-            progress = int(self.curr_step/self.tot_steps *self.bar_width)
+            try:
+                curr_term_width = shutil.get_terminal_size().columns#int(50)#ret.stdout.strip())
+            except:
+                print("TERM WIDTH ERROR")
+                return
+            #-4 explanation: -2 from progbar border and -2 for terminal boarder padding
+            curr_bar_width = self.bar_width if self.bar_width < curr_term_width - self.max_label_string_len -4\
+                    else curr_term_width - self.max_label_string_len -4
 
+            progress = int(self.curr_step/self.tot_steps *curr_bar_width)
             # Make sure last step completes bar. If bar_width > tot_steps, gap can be left
             if self.curr_step == self.tot_steps-1:
                 #Leave one space for '>'
-                progress = self.bar_width-1
+                progress = curr_bar_width-1
+
 
             string = f"{self.label_string.format(curr_fold_num=fold_num):<{self.max_label_string_len}}"
-            string += f" |{('='*progress)+'>':<{self.bar_width}}|"
+            string += f"|{('='*progress)+'>':<{curr_bar_width}}|"
             if self.curr_step < self.tot_steps - 1:
                 string += "\r"
             else:

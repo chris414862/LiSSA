@@ -3,12 +3,15 @@ import pandas as pd
 from utils.FormattingTools import Preprocessor
 from utils.Configuration import ConfigSVM, ConfigNLFeaturesSearch, ConfigSVMSearch
 from utils.SaveUtils import store_experiment_results
+from utils.terminalsize import get_terminal_size
 from evaluation.Evaluator import Evaluator
 from SSModel.cLiSSAfier import cLiSSAfier
 import sys
 import os
 import re
+import subprocess
 from pathlib import Path
+
 
 '''
 This experiments uses 10 fold cross-validation to train and predict over ALL of our annotations together
@@ -21,6 +24,7 @@ feature_sets = {
                 "NLFeatsOnly"     : ["Return", "Parameters", "SigFeatures", "Description"],
                 "ManualFeatsOnly" : ["Manual_Feats"],
                 }
+feature_sets_to_include = feature_sets[EXPERIMENT_NAME] 
 model_type = 'SVM'
 inner_folds = 10
 outer_folds = 10
@@ -41,7 +45,6 @@ fname_to_store_cache = 'inputs/Caches/finalized_exp3_cache.pickle'#'Inputs/Cache
 #Path for saving results
 results_subdir = re.sub(r"\..*", "", __file__)
 experiment_record_savedir = Path("./results/", results_subdir, EXPERIMENT_NAME)
-feature_sets_to_include = feature_sets[EXPERIMENT_NAME] #'Inputs/Caches/finalized_exp1_cache.pickle'
 
 ## Features to optimize in inner loop. Comment out to remove feature set from model and optimization training
 feats2search_spaces = {}
@@ -125,6 +128,7 @@ perfomance_estimate, full_record =  evaluator.average_multiple(
                                                                                , "feats2search_spaces" : feats2search_spaces
                                                                               }
                                                                 )
+full_record['feats_considered']=feature_sets_to_include
 
 print("Final Result:")
 print(perfomance_estimate)
